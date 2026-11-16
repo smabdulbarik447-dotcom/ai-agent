@@ -39,6 +39,7 @@ const PATHS = {
   layers: <path d="m12 2 10 5-10 5L2 7zM2 12l10 5 10-5M2 17l10 5 10-5" />,
   fb: <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />,
   check: <path d="M20 6 9 17l-5-5" />,
+  spark: <path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9zM19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9zM5 2l.7 1.6L7.3 4.3l-1.6.7L5 6.6l-.7-1.6L2.7 4.3l1.6-.7z" />,
 };
 
 export default function Icon({ name }) {

@@ -42,7 +42,7 @@ export const GET = guard((_req, _p, user) => {
     recentOrders: db.prepare('SELECT * FROM orders WHERE user_id = ? ORDER BY id DESC LIMIT 6').all(uid),
     recentConversations: db
       .prepare(
-        `SELECT c.*, (SELECT text FROM messages WHERE customer_id = c.id ORDER BY id DESC LIMIT 1) AS last_text
+        `SELECT c.*, (SELECT COALESCE(text, '📷 ছবি') FROM messages WHERE customer_id = c.id ORDER BY id DESC LIMIT 1) AS last_text
          FROM customers c WHERE c.user_id = ? AND c.is_test = 0 ORDER BY c.last_message_at DESC LIMIT 6`
       )
       .all(uid),

@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import Icon from '@/components/Icon';
 import { PageHead } from '@/components/Shell';
 import { Bubble } from '@/components/TestChat';
+import TeachModal from '@/components/TeachModal';
 import { api, initials, toast, when } from '@/lib/client';
 
 function Avatar({ c }) {
@@ -21,6 +22,7 @@ function Inbox() {
   const [list, setList] = useState([]);
   const [thread, setThread] = useState(null);
   const [text, setText] = useState('');
+  const [teach, setTeach] = useState(null);
   const box = useRef(null);
   const lastSig = useRef('');
 
@@ -117,7 +119,18 @@ function Inbox() {
                 <div className="notice" style={{ margin: '10px 0 0' }}>এই কাস্টমারের জন্য বট বন্ধ আছে — আপনি নিজে উত্তর দিচ্ছেন। আবার চালু করতে উপরের সুইচ অন করুন।</div>
               ) : null}
               <div className="msgs" ref={box}>
-                {thread.messages.map((m) => <Bubble key={m.id} m={m} />)}
+                {thread.messages.map((m, i) => (
+                  <Bubble
+                    key={m.id}
+                    m={m}
+                    onTeach={() => setTeach({
+                      source: 'chat',
+                      title: m.text,
+                      // start from what the bot said, so the owner only corrects it
+                      content: thread.messages.slice(i + 1).find((x) => x.direction === 'out' && x.text)?.text || '',
+                    })}
+                  />
+                ))}
               </div>
               <form className="composer" onSubmit={send}>
                 <input type="text" value={text} onChange={(e) => setText(e.target.value)} placeholder="নিজে উত্তর লিখুন (পাঠালে এই কাস্টমারের বট বন্ধ হবে)..." />
@@ -127,6 +140,7 @@ function Inbox() {
           )}
         </div>
       </div>
+      {teach && <TeachModal initial={teach} onClose={() => setTeach(null)} />}
     </>
   );
 }

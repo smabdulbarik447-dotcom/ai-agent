@@ -9,7 +9,7 @@ export const GET = guard((req, _p, user) => {
   return json(
     db
       .prepare(
-        `SELECT c.*, (SELECT text FROM messages WHERE customer_id = c.id ORDER BY id DESC LIMIT 1) AS last_text,
+        `SELECT c.*, (SELECT COALESCE(text, '📷 ছবি') FROM messages WHERE customer_id = c.id ORDER BY id DESC LIMIT 1) AS last_text,
                 (SELECT COUNT(*) FROM messages WHERE customer_id = c.id) AS message_count,
                 (SELECT COUNT(*) FROM orders WHERE customer_id = c.id) AS order_count,
                 (SELECT name FROM pages WHERE page_id = c.page_id) AS page_name

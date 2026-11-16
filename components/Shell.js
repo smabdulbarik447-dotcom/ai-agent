@@ -10,6 +10,7 @@ const NAV = {
   user: [
     ['/dashboard', 'Overview', 'grid'],
     ['/dashboard/agent', 'AI Agent', 'bot', 'live'],
+    ['/dashboard/training', 'AI Training', 'spark'],
     ['/dashboard/rules', 'Auto Reply', 'zap'],
     ['/dashboard/products', 'Products', 'box'],
     ['/dashboard/customers', 'Customers', 'users'],

@@ -374,3 +374,28 @@ code { background: #f1f3f2; padding: 2px 6px; border-radius: 6px; font-size: 12p
 .legal li { margin-bottom: 6px; }
 .lp-foot a { color: var(--muted); text-decoration: none; }
 .lp-foot a:hover { color: var(--ink); }
+
+/* photos in chats + training */
+.msg-img { display: block; max-width: 220px; max-height: 220px; border-radius: 12px; border: 1px solid var(--line); margin-bottom: 4px; object-fit: cover; }
+.attach-preview { display: flex; align-items: center; gap: 10px; padding: 8px 0 0; font-size: 12px; color: var(--muted); }
+.attach-preview img { width: 44px; height: 44px; object-fit: cover; border-radius: 8px; }
+.attach-preview span { flex: 1; }
+.btn.attach { padding: 0 12px; height: 40px; font-size: 17px; }
+.teach-btn { background: none; border: 0; color: var(--orange); font-size: 11px; font-weight: 700; cursor: pointer; padding: 0 2px; }
+.teach-btn:hover { text-decoration: underline; }
+.learn-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 14px; }
+.learn-stat { border: 1px solid var(--line); border-radius: 12px; padding: 14px; }
+.learn-stat b { display: block; font-size: 22px; letter-spacing: -.5px; }
+.learn-stat span { color: var(--muted); font-size: 12px; }
+.templates { display: flex; flex-wrap: wrap; gap: 8px; }
+.templates button { border: 1px dashed #f3b98a; background: var(--orange-l); color: #b4520a; border-radius: 999px; padding: 6px 12px; font-size: 12.5px; font-weight: 600; cursor: pointer; }
+.templates button:hover { border-style: solid; }
+.kn { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; display: flex; gap: 12px; align-items: flex-start; }
+.kn .t { flex: 1; min-width: 0; }
+.kn .t b { display: block; margin-bottom: 3px; }
+.kn .t p { margin: 0; color: var(--ink-2); white-space: pre-wrap; font-size: 13px; }
+.kn .actions { display: flex; gap: 6px; align-items: center; flex: none; }
+.pill.src-manual-k { background: var(--green-l); color: var(--green-d); }
+.pill.src-chat-k { background: var(--orange-l); color: #c2570c; }
+.pill.src-page_post-k { background: var(--blue-l); color: var(--blue); }
+@media (max-width: 960px) { .learn-grid { grid-template-columns: 1fr 1fr; } }

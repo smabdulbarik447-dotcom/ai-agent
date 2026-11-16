@@ -21,7 +21,8 @@ export default function Privacy() {
       <h2>1. Information we collect</h2>
       <ul>
         <li><b>Account information</b> from Customers: name, email address, phone number, business name and a hashed password.</li>
-        <li><b>Facebook Page data</b> granted through Facebook Login: the Page ID, Page name and a Page access token, used only to receive and send messages for that Page.</li>
+        <li><b>Facebook Page data</b> granted through Facebook Login: the Page ID, Page name and a Page access token, used only to receive and send messages for that Page, and the Page&apos;s own published posts (text and photos), which we read to learn the products and offers the business sells.</li>
+        <li><b>Photos sent in Messenger</b>: when an End User sends a picture or screenshot, it is analysed to find the matching product.</li>
         <li><b>Messenger conversations</b>: messages End Users send to a connected Page, the replies sent, and the End User&apos;s public profile name and picture as provided by Facebook.</li>
         <li><b>Order details</b> that End Users choose to share in chat, such as name, phone number and delivery address.</li>
         <li><b>Product information</b> that Customers add or that we read from the Customer&apos;s own website on their instruction.</li>
