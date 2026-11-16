@@ -4,8 +4,8 @@ import { getPlatform } from '@/lib/db';
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Privacy Policy' };
 
-export default function Privacy() {
-  const name = getPlatform().brand_name;
+export default async function Privacy() {
+  const name = (await getPlatform()).brand_name;
   return (
     <LegalLayout
       title="Privacy Policy"

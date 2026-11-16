@@ -4,10 +4,10 @@ import { guard, json } from '@/lib/api';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-export const GET = guard((req, _p, user) => {
+export const GET = guard(async (req, _p, user) => {
   const q = `%${(req.nextUrl.searchParams.get('q') || '').toLowerCase()}%`;
   return json(
-    db
+    (await db
       .prepare(
         `SELECT c.*, (SELECT COALESCE(text, '📷 ছবি') FROM messages WHERE customer_id = c.id ORDER BY id DESC LIMIT 1) AS last_text,
                 (SELECT COUNT(*) FROM messages WHERE customer_id = c.id) AS message_count,
@@ -17,6 +17,6 @@ export const GET = guard((req, _p, user) => {
            AND (lower(IFNULL(c.name,'')) LIKE ? OR IFNULL(c.phone,'') LIKE ? OR c.psid LIKE ?)
          ORDER BY c.last_message_at DESC LIMIT 300`
       )
-      .all(user.id, q, q, q)
+      .all(user.id, q, q, q))
   );
 });

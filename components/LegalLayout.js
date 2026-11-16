@@ -2,8 +2,8 @@ import Link from 'next/link';
 import { getPlatform } from '@/lib/db';
 
 // Shared frame for the public legal pages (privacy, terms, data deletion)
-export default function LegalLayout({ title, summary, updated, children }) {
-  const p = getPlatform();
+export default async function LegalLayout({ title, summary, updated, children }) {
+  const p = (await getPlatform());
   return (
     <div className="lp">
       <header className="lp-nav">

@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 // Facebook webhook verification (one webhook for every shop's page)
 export async function GET(req) {
   const sp = req.nextUrl.searchParams;
-  if (sp.get('hub.mode') === 'subscribe' && sp.get('hub.verify_token') === getPlatform().fb_verify_token) {
+  if (sp.get('hub.mode') === 'subscribe' && sp.get('hub.verify_token') === (await getPlatform()).fb_verify_token) {
     return new Response(sp.get('hub.challenge'), { status: 200 });
   }
   return new Response('Forbidden', { status: 403 });
@@ -18,7 +18,7 @@ export async function GET(req) {
 // Incoming Messenger events, routed to the shop that owns the page
 export async function POST(req) {
   const raw = Buffer.from(await req.arrayBuffer());
-  if (!verifySignature(raw, req.headers.get('x-hub-signature-256'))) return new Response('Bad signature', { status: 401 });
+  if (!(await verifySignature(raw, req.headers.get('x-hub-signature-256')))) return new Response('Bad signature', { status: 401 });
 
   let payload;
   try {
@@ -30,7 +30,7 @@ export async function POST(req) {
 
   const jobs = [];
   for (const entry of payload.entry || []) {
-    const page = pageForWebhook(String(entry.id));
+    const page = (await pageForWebhook(String(entry.id)));
     if (!page) continue; // page not connected, disabled, or owner suspended
     for (const ev of entry.messaging || []) {
       if (ev.message?.is_echo) {

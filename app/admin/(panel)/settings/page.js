@@ -28,13 +28,13 @@ function ServerCard() {
         <div><h3>সার্ভার ও ব্যাকআপ</h3><p>চালু আছে {uptime(sys.uptimeSec)} · Node {sys.node} · RAM {sys.memoryMb} MB</p></div>
         <a className="btn primary sm" href="/api/admin/backup">ব্যাকআপ ডাউনলোড</a>
       </div>
-      {!sys.persistentDir && (
+      {!sys.persistent && (
         <div className="notice" style={{ marginBottom: 10 }}>
-          DATA_DIR সেট করা নেই — ক্লাউড হোস্টিং এ (Railway) রিডিপ্লয় করলে ডাটা মুছে যেতে পারে। একটি Volume যুক্ত করে DATA_DIR=/data দিন।
+          ⚠️ ডাটা স্থায়ীভাবে সেভ হচ্ছে না — রিডিপ্লয় বা সার্ভার বদলালে মুছে যেতে পারে। Vercel এ Turso ডাটাবেস যুক্ত করুন, অথবা Railway তে Volume দিয়ে DATA_DIR=/data দিন।
         </div>
       )}
       <div className="list">
-        <div className="li"><div className="t"><b>ডাটাবেস</b><span>{sys.dataDir}</span></div><b>{sys.dbSizeMb} MB</b></div>
+        <div className="li"><div className="t"><b>ডাটাবেস</b><span>{sys.database}</span></div>{sys.dbSizeMb != null && <b>{sys.dbSizeMb} MB</b>}</div>
         <div className="li"><div className="t"><b>রেকর্ড</b></div>
           <span className="hint" style={{ margin: 0 }}>{sys.rows.users} ইউজার · {sys.rows.products} প্রোডাক্ট · {sys.rows.messages} মেসেজ · {sys.rows.orders} অর্ডার</span>
         </div>

@@ -4,8 +4,8 @@ import { getPlatform } from '@/lib/db';
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Terms of Service' };
 
-export default function Terms() {
-  const name = getPlatform().brand_name;
+export default async function Terms() {
+  const name = (await getPlatform()).brand_name;
   return (
     <LegalLayout
       title="Terms of Service"

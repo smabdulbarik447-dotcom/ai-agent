@@ -1,27 +1,22 @@
-import fs from 'node:fs';
-import os from 'node:os';
-import path from 'node:path';
 import { db } from '@/lib/db';
 import { guard } from '@/lib/api';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+export const maxDuration = 60;
 
-// Download a consistent copy of the whole database
-export const GET = guard(() => {
+// Download every table as one JSON file (works the same for the online and the local database)
+export const GET = guard(async () => {
   const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
-  const tmp = path.join(os.tmpdir(), `shobpaabo-backup-${stamp}-${process.pid}.db`);
-  db.exec(`VACUUM INTO '${tmp.replaceAll("'", "''")}'`);
-  try {
-    const file = fs.readFileSync(tmp);
-    return new Response(file, {
-      headers: {
-        'Content-Type': 'application/vnd.sqlite3',
-        'Content-Disposition': `attachment; filename="shobpaabo-backup-${stamp}.db"`,
-        'Cache-Control': 'no-store',
-      },
-    });
-  } finally {
-    fs.rmSync(tmp, { force: true });
-  }
+  const tables = (await db.prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' ORDER BY name").all())
+    .map((t) => t.name);
+  const dump = { created_at: new Date().toISOString(), tables: {} };
+  for (const t of tables) dump.tables[t] = await db.prepare(`SELECT * FROM "${t}"`).all();
+  return new Response(JSON.stringify(dump), {
+    headers: {
+      'Content-Type': 'application/json; charset=utf-8',
+      'Content-Disposition': `attachment; filename="shobpaabo-backup-${stamp}.json"`,
+      'Cache-Control': 'no-store',
+    },
+  });
 }, { admin: true });

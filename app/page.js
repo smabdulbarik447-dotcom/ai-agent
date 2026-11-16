@@ -16,9 +16,9 @@ const FEATURES = [
   ['o', 'pulse', 'রিপোর্ট ও অ্যানালিটিক্স', 'কতজন মেসেজ দিল, কতগুলো অটো রিপ্লাই গেল, কত সেল হলো — সব ড্যাশবোর্ডে।'],
 ];
 
-export default function Landing() {
-  const p = getPlatform();
-  const plans = getPlans();
+export default async function Landing() {
+  const p = (await getPlatform());
+  const plans = (await getPlans());
   const featured = plans.length > 1 ? plans[Math.floor(plans.length / 2)].id : null;
   const [first, ...rest] = (p.brand_name || 'Shob Paabo AI').split(' ');
 

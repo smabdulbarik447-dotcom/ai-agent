@@ -4,9 +4,9 @@ import { guard, json } from '@/lib/api';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-export const GET = guard((req) => {
+export const GET = guard(async (req) => {
   const q = `%${(req.nextUrl.searchParams.get('q') || '').toLowerCase()}%`;
-  const users = db
+  const users = (await db
     .prepare(
       `SELECT u.id, u.name, u.email, u.phone, u.role, u.status, u.created_at, u.last_login_at,
          (SELECT value FROM user_settings WHERE user_id = u.id AND key = 'business_name') AS business_name,
@@ -22,6 +22,6 @@ export const GET = guard((req) => {
        WHERE lower(u.email) LIKE ? OR lower(IFNULL(u.name,'')) LIKE ? OR IFNULL(u.phone,'') LIKE ?
        ORDER BY u.id DESC LIMIT 500`
     )
-    .all(q, q, q);
+    .all(q, q, q));
   return json(users);
 }, { admin: true });

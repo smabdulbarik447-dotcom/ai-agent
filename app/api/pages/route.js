@@ -1,25 +1,28 @@
+import { after } from 'next/server';
 import { db, getPlatform, getUserSettings } from '@/lib/db';
 import { activeSubscription } from '@/lib/billing';
 import { getPageInfo } from '@/lib/facebook';
 import { connectPage } from '@/lib/pages';
+import { runLearning } from '@/lib/learn';
 import { guard, json, body, publicUrl } from '@/lib/api';
 
 export const runtime = 'nodejs';
+export const maxDuration = 300; // the page's posts are read right after connecting
 export const dynamic = 'force-dynamic';
 
-export const GET = guard((req, _p, user) => {
-  const p = getPlatform();
-  const connected = db.prepare('SELECT id, page_id, name, active, created_at FROM pages WHERE user_id = ? ORDER BY id').all(user.id);
+export const GET = guard(async (req, _p, user) => {
+  const p = (await getPlatform());
+  const connected = (await db.prepare('SELECT id, page_id, name, active, created_at FROM pages WHERE user_id = ? ORDER BY id').all(user.id));
   const ids = new Set(connected.map((x) => x.page_id));
   // Pages from the last Facebook login that aren't connected yet (tokens stay on the server)
-  const options = JSON.parse(getUserSettings(user.id).fb_page_options || '[]')
+  const options = JSON.parse((await getUserSettings(user.id)).fb_page_options || '[]')
     .filter((o) => !ids.has(o.id))
     .map(({ id, name }) => ({ id, name }));
   return json({
     pages: connected,
     options,
     oauth: !!(p.fb_app_id && p.fb_app_secret),
-    maxPages: activeSubscription(user.id)?.max_pages ?? 0,
+    maxPages: (await activeSubscription(user.id))?.max_pages ?? 0,
     oauthRedirect: `${p.public_url || publicUrl(req)}/api/fb/callback`,
   });
 });
@@ -35,5 +38,6 @@ export const POST = guard(async (req, _p, user) => {
     throw new Error('টোকেনটি কাজ করছে না: ' + e.message);
   }
   await connectPage(user.id, { id: info.id, name: info.name, access_token: token });
+  after(() => runLearning(user.id, { budgetMs: 270_000 }).catch((e) => console.error('[learn]', e.message)));
   return json({ ok: true, page: { id: info.id, name: info.name } });
 });

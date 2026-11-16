@@ -4,8 +4,8 @@ import { getPlatform } from '@/lib/db';
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Data Deletion Instructions' };
 
-export default function DataDeletion() {
-  const p = getPlatform();
+export default async function DataDeletion() {
+  const p = (await getPlatform());
   return (
     <LegalLayout
       title="Data Deletion Instructions"
