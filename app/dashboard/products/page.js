@@ -72,7 +72,7 @@ export default function ProductsPage() {
   async function startSync(e) {
     e.preventDefault();
     // "www.shop.com" or "shop.com" works too: add https:// when it's missing
-    const clean = url.trim().replace(/s+/g, '');
+    const clean = url.trim().replace(/\s+/g, ''); // remove spaces only
     const full = /^https?:\/\//i.test(clean) ? clean : `https://${clean}`;
     setUrl(full);
     try {
