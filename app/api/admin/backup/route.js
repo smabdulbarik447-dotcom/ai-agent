@@ -8,8 +8,7 @@ export const maxDuration = 60;
 // Download every table as one JSON file (works the same for the online and the local database)
 export const GET = guard(async () => {
   const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
-  const tables = (await db.prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' ORDER BY name").all())
-    .map((t) => t.name);
+  const tables = await db.tables();
   const dump = { created_at: new Date().toISOString(), tables: {} };
   for (const t of tables) dump.tables[t] = await db.prepare(`SELECT * FROM "${t}"`).all();
   return new Response(JSON.stringify(dump), {

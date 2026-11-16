@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { db, isRemoteDb } from '@/lib/db';
+import { db, isRemoteDb, isPostgres } from '@/lib/db';
 import { guard, json } from '@/lib/api';
 
 export const runtime = 'nodejs';
@@ -18,7 +18,7 @@ export const GET = guard(async () => {
     node: process.version,
     uptimeSec: Math.round(process.uptime()),
     memoryMb: Math.round(process.memoryUsage().rss / 1048576),
-    database: remote ? 'Turso (অনলাইন ডাটাবেস)' : dir,
+    database: isPostgres() ? 'Neon PostgreSQL (অনলাইন ডাটাবেস)' : remote ? 'Turso (অনলাইন ডাটাবেস)' : dir,
     // Data is safe on Turso, or on a mounted volume; a bare /tmp on serverless is not
     persistent: remote || (!!process.env.DATA_DIR && !process.env.VERCEL),
     dbSizeMb: size == null ? null : Math.round((size / 1048576) * 10) / 10,
