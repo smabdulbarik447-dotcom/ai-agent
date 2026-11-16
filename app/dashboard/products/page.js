@@ -71,8 +71,12 @@ export default function ProductsPage() {
 
   async function startSync(e) {
     e.preventDefault();
+    // "www.shop.com" or "shop.com" works too: add https:// when it's missing
+    const clean = url.trim().replace(/s+/g, '');
+    const full = /^https?:\/\//i.test(clean) ? clean : `https://${clean}`;
+    setUrl(full);
     try {
-      await api('/sync', { method: 'POST', body: { url } });
+      await api('/sync', { method: 'POST', body: { url: full } });
       toast('সিঙ্ক শুরু হয়েছে');
       setSync((s) => ({ ...s, running: true, progress: 'শুরু হচ্ছে...' }));
     } catch (err) {
@@ -112,7 +116,7 @@ export default function ProductsPage() {
           </div>
         </div>
         <form className="row" onSubmit={startSync}>
-          <input className="grow" type="url" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://yourshop.com" required />
+          <input className="grow" type="text" inputMode="url" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="yourshop.com" required />
           <button className="btn orange" disabled={sync.running}>
             <Icon name="refresh" /> {sync.running ? 'সিঙ্ক চলছে...' : 'এখনই সিঙ্ক করুন'}
           </button>
