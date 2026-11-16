@@ -89,6 +89,23 @@ export default function PlatformSettings() {
               <div className="field"><label>App Secret</label><input type="password" name="fb_app_secret" defaultValue={s.fb_app_secret} /></div>
             </div>
             <div className="field">
+              <label>বাড়তি পারমিশন (Meta App এ যোগ করার পরেই চালু করুন)</label>
+              <div className="switch-row">
+                <input type="hidden" name="fb_scope_posts" value="0" />
+                <label className="switch"><input type="checkbox" name="fb_scope_posts" value="1" defaultChecked={s.fb_scope_posts === '1'} /><span /></label>
+                <span>পেজের পোস্ট থেকে প্রোডাক্ট শেখা <code>pages_read_engagement</code></span>
+              </div>
+              <div className="switch-row">
+                <input type="hidden" name="fb_scope_comments" value="0" />
+                <label className="switch"><input type="checkbox" name="fb_scope_comments" value="1" defaultChecked={s.fb_scope_comments === '1'} /><span /></label>
+                <span>কমেন্টে অটো রিপ্লাই <code>pages_read_user_content</code> <code>pages_manage_engagement</code></span>
+              </div>
+              <div className="hint">
+                যেটা চালু করবেন তার পারমিশন আগে Meta App এ যোগ করুন (App Dashboard → Use cases → Customize → Permissions → Add),
+                নইলে Facebook লগইনে &quot;Invalid Scopes&quot; দেখাবে। বন্ধ থাকলেও Messenger অটো রিপ্লাই পুরোপুরি কাজ করবে।
+              </div>
+            </div>
+            <div className="field">
               <label>Webhook Verify Token</label>
               <input type="text" name="fb_verify_token" defaultValue={s.fb_verify_token} />
             </div>
