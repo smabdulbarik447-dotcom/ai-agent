@@ -10,7 +10,22 @@
 | `/dashboard` | ইউজারের প্যানেল — পেজ কানেক্ট, প্রোডাক্ট, অটো রিপ্লাই, ইনবক্স, অর্ডার, Billing |
 | `/admin` | আপনার (সুপার অ্যাডমিন) প্যানেল — ইউজার, পেমেন্ট অনুমোদন, প্ল্যান, প্ল্যাটফর্ম সেটিংস |
 
-## চালু করা
+## অনলাইনে লাইভ করা (Railway) — কম্পিউটার চালু রাখতে হবে না
+
+1. github.com এ একটি **Private** repository বানান (যেমন `shobpaabo`), তারপর এই ফোল্ডারে cmd খুলে:
+   ```bat
+   git remote add origin https://github.com/<আপনার-username>/shobpaabo.git
+   git push -u origin main
+   ```
+2. railway.com → **New Project → Deploy from GitHub repo** → repo টি বেছে নিন। Railway নিজেই `Dockerfile` দেখে বিল্ড করবে।
+3. সার্ভিসে **Volume** যুক্ত করুন, Mount path: `/data` (ডাটা যেন রিডিপ্লয়ে না মোছে)।
+4. **Variables** এ দিন: `ADMIN_EMAIL`, `ADMIN_PASSWORD` (নিজের শক্ত পাসওয়ার্ড)।
+5. **Settings → Networking → Generate Domain** (বা নিজের ডোমেইন যুক্ত করুন) — https নিজে থেকেই চালু হবে।
+6. `https://<ডোমেইন>/admin/login` এ ঢুকে Platform Settings পূরণ করুন। সেখানে **ব্যাকআপ ডাউনলোড** বাটনও আছে।
+
+পরে কোড বদলালে শুধু `git add -A && git commit -m "update" && git push` — Railway নিজে নতুন ভার্সন লাইভ করবে, ডাটা থাকবে।
+
+## নিজের কম্পিউটারে চালানো (টেস্টের জন্য)
 
 ফোল্ডারের **`start.bat`** ফাইলে ডাবল-ক্লিক করুন → http://localhost:3000
 
