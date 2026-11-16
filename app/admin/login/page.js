@@ -30,8 +30,7 @@ function AdminLoginForm() {
           <h2>Admin Panel</h2>
           <p>শুধু প্ল্যাটফর্ম অ্যাডমিনের জন্য</p>
         </div>
-        <div className="field"><label>অ্যাডমিন ইমেইল</label><input type="text" name="email" autoComplete="username" required autoFocus /></div>
-        <div className="field"><label>পাসওয়ার্ড</label><input type="password" name="password" autoComplete="current-password" required /></div>
+        <div className="field"><label>অ্যাডমিন পাসওয়ার্ড</label><input type="password" name="password" autoComplete="current-password" required autoFocus /></div>
         <button className="btn primary block" disabled={busy}>{busy ? 'অপেক্ষা করুন...' : 'অ্যাডমিন লগইন'}</button>
       </form>
     </div>
