@@ -39,6 +39,9 @@ function SignupForm() {
         <div className="field"><label>ইমেইল</label><input type="text" name="email" autoComplete="email" required /></div>
         <div className="field"><label>পাসওয়ার্ড (কমপক্ষে ৬ অক্ষর)</label><input type="password" name="password" autoComplete="new-password" minLength={6} required /></div>
         <button className="btn primary block" disabled={busy}>{busy ? 'অপেক্ষা করুন...' : 'অ্যাকাউন্ট খুলুন'}</button>
+        <div className="alt">
+          অ্যাকাউন্ট খুললে আপনি আমাদের <Link href="/terms">Terms</Link> ও <Link href="/privacy">Privacy Policy</Link> মেনে নিচ্ছেন।
+        </div>
         <div className="alt">আগেই অ্যাকাউন্ট আছে? <Link href="/login">লগইন করুন</Link></div>
       </form>
     </div>

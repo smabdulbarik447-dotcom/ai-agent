@@ -81,6 +81,9 @@ export default function PlatformSettings() {
             </div>
             <div className="field"><label>Webhook Callback URL (Meta App → Messenger → Webhooks)</label><Copy value={s.webhook_url} /></div>
             <div className="field"><label>OAuth Redirect URI (Meta App → Facebook Login → Settings → Valid OAuth Redirect URIs)</label><Copy value={s.oauth_redirect} /></div>
+            <div className="field"><label>Privacy Policy URL (Meta App → Settings → Basic)</label><Copy value={s.webhook_url.replace('/webhook', '/privacy')} /></div>
+            <div className="field"><label>Terms of Service URL</label><Copy value={s.webhook_url.replace('/webhook', '/terms')} /></div>
+            <div className="field"><label>User Data Deletion → Instructions URL</label><Copy value={s.webhook_url.replace('/webhook', '/data-deletion')} /></div>
             <div className="form-grid">
               <div className="field"><label>App ID</label><input type="text" name="fb_app_id" defaultValue={s.fb_app_id} /></div>
               <div className="field"><label>App Secret</label><input type="password" name="fb_app_secret" defaultValue={s.fb_app_secret} /></div>
@@ -111,7 +114,10 @@ export default function PlatformSettings() {
             <div className="form-grid">
               <div className="field"><label>প্ল্যাটফর্মের নাম</label><input type="text" name="brand_name" defaultValue={s.brand_name} /></div>
               <div className="field"><label>ট্যাগলাইন</label><input type="text" name="brand_tagline" defaultValue={s.brand_tagline} /></div>
+              <div className="field"><label>সাপোর্ট ইমেইল</label><input type="text" name="support_email" defaultValue={s.support_email} placeholder="support@yourdomain.com" /></div>
+              <div className="field"><label>সাপোর্ট ফোন</label><input type="text" name="support_phone" defaultValue={s.support_phone} placeholder="01XXXXXXXXX" /></div>
             </div>
+            <div className="hint">সাপোর্ট ইমেইল Privacy Policy পেজে দেখাবে — Meta App Review এর জন্য লাগবে।</div>
           </div>
           <div className="card">
             <div className="card-head"><div><h3>AI (Claude)</h3><p>সব ইউজারের বট এই key দিয়ে চলবে — খরচ আপনার, প্ল্যানের লিমিট দিয়ে নিয়ন্ত্রিত</p></div></div>

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Icon from '@/components/Icon';
 import PlanCard from '@/components/PlanCard';
+import { LegalFooter } from '@/components/LegalLayout';
 import { getPlatform } from '@/lib/db';
 import { getPlans } from '@/lib/billing';
 
@@ -101,10 +102,7 @@ export default function Landing() {
         </div>
       </section>
 
-      <footer className="lp-foot">
-        <span>© {new Date().getFullYear()} {p.brand_name}</span>
-        <span>{p.brand_tagline}</span>
-      </footer>
+      <LegalFooter name={p.brand_name} />
     </div>
   );
 }

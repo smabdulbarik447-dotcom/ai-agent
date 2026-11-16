@@ -10,7 +10,7 @@ export function Bubble({ m }) {
       <div className={`msg ${m.direction}`}>{m.text}</div>
       <div className="msg-meta">
         {when(m.created_at)}
-        {m.direction === 'out' && <span className={`pill ${m.source}`}>{SOURCE[m.source] || m.source}</span>}
+        {m.direction === 'out' && <span className={`pill src-${m.source}`}>{SOURCE[m.source] || m.source}</span>}
       </div>
     </div>
   );
