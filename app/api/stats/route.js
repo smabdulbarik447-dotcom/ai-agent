@@ -16,7 +16,7 @@ export const GET = guard(async (_req, _p, user) => {
       `WITH RECURSIVE d(day) AS (SELECT date('now','-13 days') UNION ALL SELECT date(day,'+1 day') FROM d WHERE day < date('now'))
        SELECT d.day,
          (SELECT COUNT(*) FROM ${M} WHERE date(m.created_at) = d.day AND m.direction = 'in') AS incoming,
-         (SELECT COUNT(*) FROM ${M} WHERE date(m.created_at) = d.day AND m.direction = 'out' AND m.source IN ('rule','ai')) AS auto
+         (SELECT COUNT(*) FROM ${M} WHERE date(m.created_at) = d.day AND m.direction = 'out' AND m.source IN ('rule','ai','product')) AS auto
        FROM d`
     )
     .all(uid, uid));
@@ -24,7 +24,7 @@ export const GET = guard(async (_req, _p, user) => {
     .prepare(`SELECT m.source, COUNT(*) AS c FROM ${M} WHERE m.direction = 'out' AND m.created_at >= datetime('now','-30 days') GROUP BY m.source ORDER BY c DESC`)
     .all(uid));
   const inCount = (await one(`SELECT COUNT(*) AS c FROM ${M} WHERE m.direction='in' AND m.created_at >= datetime('now','-30 days')`, uid)).c;
-  const autoCount = sources.filter((x) => x.source === 'rule' || x.source === 'ai').reduce((a, x) => a + x.c, 0);
+  const autoCount = sources.filter((x) => x.source === 'rule' || x.source === 'ai' || x.source === 'product').reduce((a, x) => a + x.c, 0);
   return json({
     business: { name: s.business_name, tagline: s.tagline, logo: s.logo_url || '/logo.svg' },
     totals: {
