@@ -4,3 +4,6 @@ data
 data-demo
 .env
 *.log
+
+.vercel
+.env*
