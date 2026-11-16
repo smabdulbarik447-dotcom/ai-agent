@@ -10,6 +10,7 @@ export default function UsersPage() {
   const [q, setQ] = useState('');
   const [users, setUsers] = useState([]);
   const [plans, setPlans] = useState([]);
+  const [rate, setRate] = useState(122);
   const [granting, setGranting] = useState(null);
 
   const load = useCallback(() => api('/admin/users?q=' + encodeURIComponent(q)).then(setUsers), [q]);
@@ -17,7 +18,21 @@ export default function UsersPage() {
     const t = setTimeout(load, 250);
     return () => clearTimeout(t);
   }, [load]);
-  useEffect(() => { api('/admin/plans').then(setPlans); }, []);
+  useEffect(() => {
+    api('/admin/plans').then(setPlans);
+    api('/admin/settings').then((x) => setRate(Number(x.usd_to_bdt) || 122));
+  }, []);
+
+  // Open this user's dashboard as them (to help with support); "অ্যাডমিনে ফিরুন" brings you back
+  async function loginAs(u) {
+    if (!confirm(`${u.name} (${u.email}) এর ড্যাশবোর্ড তার মতো করে দেখবেন?`)) return;
+    try {
+      await api(`/admin/users/${u.id}/login-as`, { method: 'POST' });
+      window.location.href = '/dashboard';
+    } catch (e) {
+      toast(e.message, true);
+    }
+  }
 
   async function update(u, body, msg) {
     try {
@@ -49,7 +64,7 @@ export default function UsersPage() {
         <div className="table-wrap">
           <table>
             <thead>
-              <tr><th>User</th><th>প্ল্যান</th><th>মেয়াদ</th><th>পেজ</th><th>প্রোডাক্ট</th><th>AI (মাস)</th><th>স্ট্যাটাস</th><th>শেষ লগইন</th><th /></tr>
+              <tr><th>User</th><th>প্ল্যান</th><th>মেয়াদ</th><th>পেজ</th><th>প্রোডাক্ট</th><th>AI (মাস)</th><th>AI খরচ</th><th>স্ট্যাটাস</th><th>শেষ লগইন</th><th /></tr>
             </thead>
             <tbody>
               {users.map((u) => (
@@ -68,9 +83,11 @@ export default function UsersPage() {
                   <td>{u.pages}</td>
                   <td>{u.products}</td>
                   <td>{u.ai_month}</td>
+                  <td style={{ whiteSpace: 'nowrap' }} title={'$' + Number(u.ai_cost_usd || 0).toFixed(3)}>৳{Math.round((u.ai_cost_usd || 0) * rate)}</td>
                   <td><span className={`pill ${u.status}`}>{u.status === 'active' ? 'চালু' : 'সাসপেন্ড'}</span></td>
                   <td className="hint" style={{ whiteSpace: 'nowrap' }}>{when(u.last_login_at) || '—'}</td>
                   <td style={{ whiteSpace: 'nowrap' }}>
+                    {u.role !== 'admin' && <><button className="btn sm" onClick={() => loginAs(u)}>👁 দেখুন</button>{' '}</>}
                     <button className="btn sm" onClick={() => setGranting(u)}>প্ল্যান দিন</button>{' '}
                     {u.plan_name && <><button className="btn sm" onClick={() => confirm('এই ইউজারের প্ল্যান বন্ধ করবেন?') && update(u, { endPlan: true }, 'প্ল্যান বন্ধ হয়েছে')}>প্ল্যান বন্ধ</button>{' '}</>}
                     {u.id !== me?.user.id && (

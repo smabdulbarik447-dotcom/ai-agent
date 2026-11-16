@@ -26,6 +26,9 @@ export const GET = guard(async () => {
       revenueMonth: (await one("SELECT IFNULL(SUM(amount),0) AS c FROM payments WHERE status = 'approved' AND strftime('%Y-%m', reviewed_at) = strftime('%Y-%m','now')")),
       revenueAll: (await one("SELECT IFNULL(SUM(amount),0) AS c FROM payments WHERE status = 'approved'")),
       aiMonth: (await one("SELECT IFNULL(SUM(ai_replies),0) AS c FROM usage WHERE month = strftime('%Y-%m','now')")),
+      // Claude API cost this month in USD (estimate from token counts)
+      aiCostUsd: (await one("SELECT IFNULL(SUM(cost_usd),0) AS c FROM usage WHERE month = strftime('%Y-%m','now')")),
+      usdToBdt: Number((await db.prepare("SELECT value FROM settings WHERE key = 'usd_to_bdt'").get())?.value) || 122,
       pages: (await one('SELECT COUNT(*) AS c FROM pages WHERE active = 1')),
     },
     days,

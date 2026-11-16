@@ -13,6 +13,7 @@ export const POST = guard(async (req, { id }, user) => {
   if (!text) throw new Error('মেসেজ লিখুন');
   const ids = await sendText(page.access_token, c.psid, text);
   (await saveMessage(c.id, { mid: ids[0], direction: 'out', source: 'manual', text }));
+  await db.prepare('UPDATE customers SET needs_human = 0, human_reason = NULL WHERE id = ?').run(c.id);
   if ((await getUserSettings(user.id)).pause_on_manual_reply === '1') (await db.prepare('UPDATE customers SET bot_paused = 1 WHERE id = ?').run(c.id));
   return json({ ok: true });
 });

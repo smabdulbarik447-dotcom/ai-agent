@@ -31,10 +31,17 @@ export default function TrainingPage() {
   const [items, setItems] = useState([]);
   const [q, setQ] = useState('');
   const [teach, setTeach] = useState(null);
+  const [unanswered, setUnanswered] = useState([]);
 
   const loadInfo = useCallback(() => api('/learn').then(setInfo).catch(() => {}), []);
   const loadItems = useCallback(() => api('/knowledge').then(setItems), []);
-  useEffect(() => { loadInfo(); loadItems(); }, [loadInfo, loadItems]);
+  const loadUnanswered = useCallback(() => api('/unanswered').then(setUnanswered).catch(() => {}), []);
+  useEffect(() => { loadInfo(); loadItems(); loadUnanswered(); }, [loadInfo, loadItems, loadUnanswered]);
+
+  async function closeQuestion(u, status) {
+    await api('/unanswered/' + u.id, { method: 'PUT', body: { status } });
+    loadUnanswered();
+  }
 
   // Poll progress while learning runs
   useEffect(() => {
@@ -108,6 +115,24 @@ export default function TrainingPage() {
         )}
       </div>
 
+      {unanswered.length > 0 && (
+        <div className="card" style={{ marginBottom: 14 }}>
+          <div className="card-head">
+            <div><h3>⚠️ AI যে প্রশ্নের উত্তর জানে না ({unanswered.length})</h3><p>কাস্টমাররা এগুলো জিজ্ঞেস করেছে কিন্তু AI উত্তর দিতে পারেনি। একবার শেখালে পরের বার নিজেই উত্তর দেবে।</p></div>
+          </div>
+          {unanswered.slice(0, 15).map((u) => (
+            <div className="uq" key={u.id}>
+              <div className="t">
+                <b>{u.question}</b>
+                <span>{u.reason}{u.customer_name ? ` · ${u.customer_name}` : ''}{u.times > 1 ? ` · ${u.times} বার জিজ্ঞেস করেছে` : ''} · {when(u.created_at)}</span>
+              </div>
+              <button className="btn sm primary" onClick={() => setTeach({ source: 'chat', title: u.question, content: '', unansweredId: u.id })}>✨ উত্তর শেখান</button>
+              <button className="btn sm" onClick={() => closeQuestion(u, 'dismissed')}>বাদ দিন</button>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="grid-2">
         <div className="stack">
           <div className="card">
@@ -151,7 +176,18 @@ export default function TrainingPage() {
         </div>
       </div>
 
-      {teach && <TeachModal initial={teach} onClose={() => setTeach(null)} onSaved={() => { loadItems(); loadInfo(); }} />}
+      {teach && (
+        <TeachModal
+          initial={teach}
+          onClose={() => setTeach(null)}
+          onSaved={async () => {
+            if (teach.unansweredId) await api('/unanswered/' + teach.unansweredId, { method: 'PUT', body: { status: 'done' } });
+            loadItems();
+            loadInfo();
+            loadUnanswered();
+          }}
+        />
+      )}
     </>
   );
 }

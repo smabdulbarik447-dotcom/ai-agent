@@ -6,6 +6,7 @@ export const dynamic = 'force-dynamic';
 
 export const GET = guard(async (req, _p, user) => {
   const q = `%${(req.nextUrl.searchParams.get('q') || '').toLowerCase()}%`;
+  const attention = req.nextUrl.searchParams.get('attention') === '1' ? 1 : 0;
   return json(
     (await db
       .prepare(
@@ -15,8 +16,9 @@ export const GET = guard(async (req, _p, user) => {
                 (SELECT name FROM pages WHERE page_id = c.page_id) AS page_name
          FROM customers c WHERE c.user_id = ? AND c.is_test = 0
            AND (lower(IFNULL(c.name,'')) LIKE ? OR IFNULL(c.phone,'') LIKE ? OR c.psid LIKE ?)
-         ORDER BY c.last_message_at DESC LIMIT 300`
+           AND (? = 0 OR c.needs_human = 1)
+         ORDER BY c.needs_human DESC, c.last_message_at DESC LIMIT 300`
       )
-      .all(user.id, q, q, q))
+      .all(user.id, q, q, q, attention))
   );
 });

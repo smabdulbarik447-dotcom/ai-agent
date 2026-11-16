@@ -42,7 +42,9 @@ export default function AdminOverview() {
         <Kpi color="g" icon="users" label="Total Users" value={t.users}><b>{t.paying}</b> পেইড · <b>{t.trial}</b> ট্রায়াল</Kpi>
         <Kpi color="o" icon="card" label="এই মাসের আয়" value={money(t.revenueMonth)}>মোট <b>{money(t.revenueAll)}</b></Kpi>
         <Kpi color="p" icon="fb" label="কানেক্টেড পেজ" value={t.pages}>সব ইউজার মিলিয়ে</Kpi>
-        <Kpi color="r" icon="bot" label="AI রিপ্লাই (এই মাস)" value={t.aiMonth.toLocaleString('en-IN')}>Claude API খরচের হিসাব</Kpi>
+        <Kpi color="r" icon="bot" label="AI খরচ (এই মাস)" value={money(Math.round(t.aiCostUsd * t.usdToBdt))}>
+          {t.aiMonth.toLocaleString('en-IN')} রিপ্লাই · লাভ <b>{money(Math.round(t.revenueMonth - t.aiCostUsd * t.usdToBdt))}</b>
+        </Kpi>
       </section>
 
       <section className="grid-2-eq" style={{ marginBottom: 14 }}>

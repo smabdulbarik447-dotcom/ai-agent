@@ -19,6 +19,7 @@ function Inbox() {
   const params = useSearchParams();
   const [active, setActive] = useState(Number(params.get('c')) || null);
   const [q, setQ] = useState('');
+  const [onlyAttention, setOnlyAttention] = useState(params.get('attention') === '1');
   const [list, setList] = useState([]);
   const [thread, setThread] = useState(null);
   const [text, setText] = useState('');
@@ -26,7 +27,10 @@ function Inbox() {
   const box = useRef(null);
   const lastSig = useRef('');
 
-  const loadList = useCallback(() => api('/conversations?q=' + encodeURIComponent(q)).then(setList).catch(() => {}), [q]);
+  const loadList = useCallback(
+    () => api(`/conversations?q=${encodeURIComponent(q)}${onlyAttention ? '&attention=1' : ''}`).then(setList).catch(() => {}),
+    [q, onlyAttention]
+  );
   const loadThread = useCallback(async () => {
     if (!active) return;
     const t = await api(`/conversations/${active}/messages`).catch(() => null);
@@ -58,6 +62,13 @@ function Inbox() {
     window.history.replaceState(null, '', '/dashboard/inbox?c=' + id);
   }
 
+  async function resolve() {
+    await api(`/conversations/${active}/bot`, { method: 'POST', body: { resolved: true } });
+    lastSig.current = '';
+    loadThread();
+    loadList();
+  }
+
   async function toggleBot(on) {
     await api(`/conversations/${active}/bot`, { method: 'POST', body: { paused: !on } });
     loadThread();
@@ -86,12 +97,19 @@ function Inbox() {
       <div className="inbox">
         <div className="card">
           <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="নাম বা ফোন দিয়ে খুঁজুন..." style={{ marginBottom: 10 }} />
+          <div className="tabs">
+            <button className={onlyAttention ? '' : 'on'} onClick={() => setOnlyAttention(false)}>সব চ্যাট</button>
+            <button className={onlyAttention ? 'on' : ''} onClick={() => setOnlyAttention(true)}>⚠️ নজর দরকার</button>
+          </div>
           <div className="conv-list">
             {!list.length && <div className="empty">কোনো কথোপকথন নেই</div>}
             {list.map((x) => (
-              <div key={x.id} className={'conv' + (x.id === active ? ' active' : '')} onClick={() => open(x.id)}>
+              <div key={x.id} className={'conv' + (x.id === active ? ' active' : '') + (x.needs_human ? ' attention' : '')} onClick={() => open(x.id)}>
                 <Avatar c={x} />
-                <div className="t"><b>{x.name || 'Facebook User'}</b><span>{x.last_text}</span></div>
+                <div className="t">
+                  <b>{x.name || 'Facebook User'}</b><span>{x.last_text}</span>
+                  {x.needs_human ? <span className="attn">⚠️ {x.human_reason || 'নজর দরকার'}</span> : null}
+                </div>
                 <div className="time">
                   {when(x.last_message_at)}<br />
                   {x.unread > 0 && x.id !== active ? <span className="badge">{x.unread}</span> : x.bot_paused ? <span className="pill off" style={{ fontSize: 10 }}>bot off</span> : null}
@@ -112,6 +130,9 @@ function Inbox() {
                   <b>{c.name || 'Facebook User'}</b>
                   <div className="hint" style={{ margin: 0 }}>{c.phone} {c.address}</div>
                 </div>
+                {c.needs_human ? (
+                  <button className="btn sm orange" onClick={resolve} title={c.human_reason || ''}>✓ সমাধান হয়েছে</button>
+                ) : null}
                 <span className="hint" style={{ margin: 0 }}>AI বট</span>
                 <label className="switch"><input type="checkbox" checked={!c.bot_paused} onChange={(e) => toggleBot(e.target.checked)} /><span /></label>
               </div>

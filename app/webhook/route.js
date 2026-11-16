@@ -2,9 +2,11 @@ import { after } from 'next/server';
 import { getPlatform } from '@/lib/db';
 import { verifySignature } from '@/lib/facebook';
 import { enqueue, handleCustomerMessage, handlePageEcho, pageForWebhook } from '@/lib/agent';
+import { handleComment } from '@/lib/comments';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+export const maxDuration = 60; // AI replies run after Facebook gets its answer
 
 // Facebook webhook verification (one webhook for every shop's page)
 export async function GET(req) {
@@ -15,7 +17,7 @@ export async function GET(req) {
   return new Response('Forbidden', { status: 403 });
 }
 
-// Incoming Messenger events, routed to the shop that owns the page
+// Incoming Messenger events and post comments, routed to the shop that owns the page
 export async function POST(req) {
   const raw = Buffer.from(await req.arrayBuffer());
   if (!(await verifySignature(raw, req.headers.get('x-hub-signature-256')))) return new Response('Bad signature', { status: 401 });
@@ -32,6 +34,12 @@ export async function POST(req) {
   for (const entry of payload.entry || []) {
     const page = (await pageForWebhook(String(entry.id)));
     if (!page) continue; // page not connected, disabled, or owner suspended
+    // New comments on the page's posts
+    for (const ch of entry.changes || []) {
+      if (ch.field === 'feed' && ch.value?.item === 'comment') {
+        jobs.push(enqueue(`comment:${ch.value.comment_id}`, () => handleComment(page, ch.value)));
+      }
+    }
     for (const ev of entry.messaging || []) {
       if (ev.message?.is_echo) {
         const psid = ev.recipient.id;

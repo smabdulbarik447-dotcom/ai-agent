@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { PageHead, useMe } from '@/components/Shell';
 import { api, toast } from '@/lib/client';
 
-const SWITCHES = ['pause_on_manual_reply', 'sync_ai_extract'];
+const SWITCHES = ['pause_on_manual_reply', 'sync_ai_extract', 'notify_order_status'];
 
 export default function SettingsPage() {
   const { me, reload } = useMe();
@@ -70,6 +70,18 @@ export default function SettingsPage() {
               <label className="switch"><input type="checkbox" name="sync_ai_extract" defaultChecked={s.sync_ai_extract === '1'} /><span /></label>
               <span>AI দিয়ে পেজ পড়া <span className="hint">(সাধারণ ওয়েবসাইটে প্রোডাক্ট ডাটা না পেলে)</span></span>
             </div>
+          </div>
+          <div className="card">
+            <div className="card-head"><div><h3>অর্ডার ও কুরিয়ার</h3><p>অর্ডারের স্ট্যাটাস বদলালে কাস্টমারকে জানানো আর Steadfast এ এক ক্লিকে পার্সেল বুক</p></div></div>
+            <div className="switch-row">
+              <label className="switch"><input type="checkbox" name="notify_order_status" defaultChecked={s.notify_order_status === '1'} /><span /></label>
+              অর্ডার কনফার্ম / শিপড / ডেলিভারড হলে কাস্টমারকে Messenger এ জানাবে
+            </div>
+            <div className="form-grid">
+              <div className="field"><label>Steadfast API Key</label><input type="password" name="steadfast_api_key" defaultValue={s.steadfast_api_key} autoComplete="off" /></div>
+              <div className="field"><label>Steadfast Secret Key</label><input type="password" name="steadfast_secret_key" defaultValue={s.steadfast_secret_key} autoComplete="off" /></div>
+            </div>
+            <div className="hint">Steadfast প্যানেল → API সেটিংস থেকে কী দুটো নিন। দিলে Orders পেজে প্রতিটি অর্ডারের পাশে 🚚 বাটন কাজ করবে।</div>
           </div>
           <button className="btn primary" style={{ alignSelf: 'flex-start' }}>সেভ করুন</button>
         </form>

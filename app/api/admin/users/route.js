@@ -13,6 +13,7 @@ export const GET = guard(async (req) => {
          (SELECT COUNT(*) FROM pages WHERE user_id = u.id) AS pages,
          (SELECT COUNT(*) FROM products WHERE user_id = u.id) AS products,
          (SELECT IFNULL(SUM(ai_replies),0) FROM usage WHERE user_id = u.id AND month = strftime('%Y-%m','now')) AS ai_month,
+         (SELECT IFNULL(SUM(cost_usd),0) FROM usage WHERE user_id = u.id AND month = strftime('%Y-%m','now')) AS ai_cost_usd,
          s.status AS sub_status, s.ends_at, s.plan_id, p.name AS plan_name
        FROM users u
        LEFT JOIN subscriptions s ON s.id = (

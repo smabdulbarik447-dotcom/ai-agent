@@ -100,15 +100,34 @@ export default function PlatformSettings() {
               <li><a href="https://developers.facebook.com/apps" target="_blank" rel="noreferrer">developers.facebook.com</a> এ একটি <b>Business</b> টাইপ App তৈরি করুন।</li>
               <li><b>Facebook Login for Business</b> ও <b>Messenger</b> প্রোডাক্ট যোগ করুন।</li>
               <li>Facebook Login → Settings এ উপরের <b>OAuth Redirect URI</b> দিন।</li>
-              <li>Messenger → Webhooks এ <b>Callback URL</b> ও <b>Verify Token</b> দিন, <code>messages</code>, <code>messaging_postbacks</code>, <code>message_echoes</code> সাবস্ক্রাইব করুন।</li>
+              <li>Messenger → Webhooks এ <b>Callback URL</b> ও <b>Verify Token</b> দিন, <code>messages</code>, <code>messaging_postbacks</code>, <code>message_echoes</code> সাবস্ক্রাইব করুন। কমেন্ট অটো রিপ্লাইয়ের জন্য Webhooks → <b>Page</b> অবজেক্টে <code>feed</code> ও সাবস্ক্রাইব করুন।</li>
               <li>App ID ও App Secret (Settings → Basic) এখানে দিন।</li>
-              <li>ইউজাররা যাতে নিজেদের পেজ কানেক্ট করতে পারে, তার জন্য <code>pages_messaging</code>, <code>pages_manage_metadata</code>, <code>pages_show_list</code> পারমিশনের <b>App Review</b> করান এবং App টি <b>Live</b> করুন। রিভিউ পাওয়ার আগে শুধু App এ Tester হিসেবে যোগ করা ইউজাররাই কানেক্ট করতে পারবে।</li>
+              <li>ইউজাররা যাতে নিজেদের পেজ কানেক্ট করতে পারে, তার জন্য <code>pages_messaging</code>, <code>pages_manage_metadata</code>, <code>pages_show_list</code>, <code>pages_read_engagement</code>, <code>pages_read_user_content</code>, <code>pages_manage_engagement</code> পারমিশনের <b>App Review</b> করান এবং App টি <b>Live</b> করুন। রিভিউ পাওয়ার আগে শুধু App এ Tester হিসেবে যোগ করা ইউজাররাই কানেক্ট করতে পারবে।</li>
             </ol>
           </div>
         </div>
 
         <div className="stack">
           <ServerCard />
+          <div className="card">
+            <div className="card-head"><div><h3>📢 সব ইউজারকে নোটিশ</h3><p>লিখলে প্রত্যেক ইউজারের ড্যাশবোর্ডের উপরে দেখাবে। খালি রাখলে কিছু দেখাবে না।</p></div></div>
+            <div className="field">
+              <textarea name="announcement_text" rows={2} defaultValue={s.announcement_text} placeholder="যেমন: ঈদ অফার! Business প্ল্যানে ২০% ছাড়, শুধু এই সপ্তাহে।" />
+            </div>
+            <div className="form-grid">
+              <div className="field">
+                <label>ধরন</label>
+                <select name="announcement_type" defaultValue={s.announcement_type}>
+                  <option value="info">সাধারণ (সবুজ)</option>
+                  <option value="warn">জরুরি (কমলা)</option>
+                </select>
+              </div>
+              <div className="field">
+                <label>১ ডলার = কত টাকা (AI খরচ দেখাতে)</label>
+                <input type="number" step="0.01" name="usd_to_bdt" defaultValue={s.usd_to_bdt} />
+              </div>
+            </div>
+          </div>
           <div className="card">
             <div className="card-head"><div><h3>ব্র্যান্ড</h3></div></div>
             <div className="form-grid">

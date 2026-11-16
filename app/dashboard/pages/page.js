@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Icon from '@/components/Icon';
 import { PageHead } from '@/components/Shell';
+import CommentsCard from '@/components/CommentsCard';
 import { api, toast, when, limitText } from '@/lib/client';
 
 function Pages() {
@@ -89,6 +90,8 @@ function Pages() {
           </div>
         )}
       </div>
+
+      <CommentsCard />
 
       <div className="card">
         <div className="card-head">

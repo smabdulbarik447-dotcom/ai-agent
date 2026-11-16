@@ -10,12 +10,12 @@ const NAV = {
   user: [
     ['/dashboard', 'Overview', 'grid'],
     ['/dashboard/agent', 'AI Agent', 'bot', 'live'],
-    ['/dashboard/training', 'AI Training', 'spark'],
+    ['/dashboard/training', 'AI Training', 'spark', 'unanswered'],
     ['/dashboard/rules', 'Auto Reply', 'zap'],
     ['/dashboard/products', 'Products', 'box'],
     ['/dashboard/customers', 'Customers', 'users'],
     ['/dashboard/orders', 'Orders', 'clip', 'orders'],
-    ['/dashboard/inbox', 'Inbox', 'inbox', 'unread'],
+    ['/dashboard/inbox', 'Inbox', 'inbox', 'unread', 'attention'],
     ['/dashboard/pages', 'Facebook Pages', 'fb'],
     ['/dashboard/billing', 'Billing', 'card'],
     ['/dashboard/settings', 'Settings', 'cog'],
@@ -90,6 +90,11 @@ export default function Shell({ variant = 'user', children }) {
     if (variant === 'admin' && me && me.user.role !== 'admin') router.replace('/admin/login');
   }, [variant, me, router]);
 
+  async function backToAdmin() {
+    const r = await api('/auth/back-to-admin', { method: 'POST' });
+    window.location.href = r.role === 'admin' ? '/admin/users' : '/admin/login';
+  }
+
   async function logout() {
     await api('/auth/logout', { method: 'POST' });
     window.location.href = variant === 'admin' ? '/admin/login' : '/login';
@@ -113,12 +118,15 @@ export default function Shell({ variant = 'user', children }) {
             {variant === 'admin' && <span className="badge admin-tag">Super Admin</span>}
           </div>
           <nav className="nav">
-            {NAV[variant].map(([href, label, icon, badge]) => (
+            {NAV[variant].map(([href, label, icon, badge, warn]) => (
               <Link key={href} href={href} className={active(href) ? 'active' : ''}>
                 <Icon name={icon} />
                 {label}
                 {badge === 'live' && <span className="badge live">Live</span>}
-                {badge && badge !== 'live' && badges[badge] > 0 && <span className="badge">{badges[badge]}</span>}
+                {badge && badge !== 'live' && badges[badge] > 0 && (
+                  <span className={'badge' + (badge === 'unanswered' ? ' warn' : '')} title={badge === 'unanswered' ? 'AI যে প্রশ্নের উত্তর জানে না' : undefined}>{badges[badge]}</span>
+                )}
+                {warn && badges[warn] > 0 && <span className="badge warn" title="আপনার নজর দরকার">!{badges[warn]}</span>}
               </Link>
             ))}
           </nav>
@@ -138,7 +146,18 @@ export default function Shell({ variant = 'user', children }) {
             </span>
           </div>
         </aside>
-        <main className="main">{children}</main>
+        <main className="main">
+          {variant === 'user' && me?.impersonating && (
+            <div className="notice impersonate">
+              আপনি অ্যাডমিন হিসেবে <b>{me.user.name} ({me.user.email})</b> এর অ্যাকাউন্ট দেখছেন।
+              <button className="btn sm" onClick={backToAdmin}>অ্যাডমিনে ফিরুন</button>
+            </div>
+          )}
+          {variant === 'user' && me?.announcement && (
+            <div className={'notice' + (me.announcement.type === 'info' ? ' ok' : '')}>📢 {me.announcement.text}</div>
+          )}
+          {children}
+        </main>
       </div>
     </ShellContext.Provider>
   );

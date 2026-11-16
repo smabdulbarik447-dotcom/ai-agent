@@ -399,3 +399,18 @@ code { background: #f1f3f2; padding: 2px 6px; border-radius: 6px; font-size: 12p
 .pill.src-chat-k { background: var(--orange-l); color: #c2570c; }
 .pill.src-page_post-k { background: var(--blue-l); color: var(--blue); }
 @media (max-width: 960px) { .learn-grid { grid-template-columns: 1fr 1fr; } }
+
+/* attention / admin notices */
+.badge.warn { background: var(--orange); }
+.badge + .badge { margin-left: 4px; }
+.notice.impersonate { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: #17211c; color: #fff; border-color: #17211c; }
+.notice.impersonate .btn { background: #fff; }
+.conv.attention { box-shadow: inset 3px 0 0 var(--orange); }
+.attn { display: inline-block; background: var(--orange-l); color: #b4520a; font-size: 11px; font-weight: 700; border-radius: 999px; padding: 1px 8px; margin-top: 2px; }
+.tabs { display: flex; gap: 6px; margin-bottom: 10px; }
+.tabs button { border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 5px 12px; font-size: 12.5px; font-weight: 600; cursor: pointer; }
+.tabs button.on { background: var(--green); border-color: var(--green); color: #fff; }
+.uq { border: 1px solid #fde0c5; background: #fffaf5; border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; display: flex; gap: 10px; align-items: center; }
+.uq .t { flex: 1; min-width: 0; }
+.uq .t b { display: block; }
+.uq .t span { color: var(--muted); font-size: 12px; }
