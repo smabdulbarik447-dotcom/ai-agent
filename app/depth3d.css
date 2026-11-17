@@ -236,3 +236,15 @@ input[type=text], input[type=number], input[type=password], input[type=url], inp
   .lp-nav nav { flex-wrap: nowrap; gap: 6px; }
   .lp-nav .btn { padding: 7px 10px; font-size: 12px; }
 }
+
+/* product photo picker */
+.img-pick { border: 2px dashed #cfdcd5; border-radius: 14px; min-height: 150px; display: grid; place-items: center; cursor: pointer;
+  background: linear-gradient(180deg, #f8fbf9, #fff); transition: border-color .15s, background .15s, transform .15s; overflow: hidden; outline: none; }
+.img-pick:hover, .img-pick:focus { border-color: var(--green); }
+.img-pick.drag { border-color: var(--green); background: var(--green-l); transform: scale(1.01); }
+.img-pick.has { cursor: default; border-style: solid; background: #f3f6f4; }
+.img-pick img { display: block; max-width: 100%; max-height: 240px; object-fit: contain; }
+.img-empty { text-align: center; padding: 18px; color: var(--ink-2); }
+.img-empty .img-ic { font-size: 30px; display: block; margin-bottom: 6px; }
+.img-empty b { display: block; font-size: 13.5px; }
+.img-empty small { color: var(--muted); font-size: 11.5px; }

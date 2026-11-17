@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import Icon from '@/components/Icon';
 import Modal from '@/components/Modal';
+import ImagePicker from '@/components/ImagePicker';
 import { PageHead, useMe } from '@/components/Shell';
 import { api, money, toast, when, limitText, STOCK } from '@/lib/client';
 
@@ -25,7 +26,7 @@ function ProductForm({ p = {} }) {
       </div>
       <div className="field"><label>বিবরণ</label><textarea name="description" rows={4} defaultValue={p.description ?? ''} /></div>
       <div className="field"><label>প্রোডাক্ট লিংক</label><input type="text" name="url" defaultValue={p.url ?? ''} /></div>
-      <div className="field"><label>ছবির লিংক</label><input type="text" name="image" defaultValue={p.image ?? ''} /></div>
+      <ImagePicker name="image" defaultValue={p.image ?? ''} />
       <div className="switch-row">
         <label className="switch"><input type="checkbox" name="active" defaultChecked={p.active !== 0} /><span /></label> AI এই প্রোডাক্ট দেখাবে
       </div>

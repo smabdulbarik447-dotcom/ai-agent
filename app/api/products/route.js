@@ -1,6 +1,7 @@
 import { db, upsertProduct } from '@/lib/db';
 import { checkLimit } from '@/lib/billing';
 import { guard, json, body } from '@/lib/api';
+import { resolveImage } from '@/lib/images';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -23,6 +24,7 @@ export const POST = guard(async (req, _p, user) => {
   const b = await body(req);
   if (!b.name) throw new Error('নাম দিন');
   (await checkLimit(user.id, 'products'));
+  if (b.image) b.image = await resolveImage(user.id, b.image, req);
   const id = (await upsertProduct(user.id, { ...b, source: 'manual', source_key: null }));
   if (b.active === 0) (await db.prepare('UPDATE products SET active = 0 WHERE id = ?').run(id));
   return json((await db.prepare('SELECT * FROM products WHERE id = ?').get(id)));
