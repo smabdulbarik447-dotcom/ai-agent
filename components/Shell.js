@@ -16,7 +16,7 @@ const NAV = {
     ['/dashboard/customers', 'Customers', 'users'],
     ['/dashboard/orders', 'Orders', 'clip', 'orders'],
     ['/dashboard/inbox', 'Inbox', 'inbox', 'unread', 'attention'],
-    ['/dashboard/pages', 'Facebook Pages', 'fb'],
+    ['/dashboard/pages', 'Pages & WhatsApp', 'fb'],
     ['/dashboard/billing', 'Billing', 'card'],
     ['/dashboard/settings', 'Settings', 'cog'],
   ],

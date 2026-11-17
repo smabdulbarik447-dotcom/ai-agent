@@ -14,7 +14,7 @@ export const PUT = guard(async (req, { id }, user) => {
 export const DELETE = guard(async (_req, { id }, user) => {
   const page = (await db.prepare('SELECT * FROM pages WHERE id = ? AND user_id = ?').get(id, user.id));
   if (!page) throw new Error('পেজ পাওয়া যায়নি');
-  await unsubscribePage(page.page_id, page.access_token);
+  if (page.channel !== 'whatsapp') await unsubscribePage(page.page_id, page.access_token).catch(() => {});
   (await db.prepare('DELETE FROM pages WHERE id = ?').run(page.id));
   return json({ ok: true });
 });

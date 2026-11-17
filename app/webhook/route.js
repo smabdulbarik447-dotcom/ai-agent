@@ -2,6 +2,7 @@ import { after } from 'next/server';
 import { getPlatform } from '@/lib/db';
 import { verifySignature } from '@/lib/facebook';
 import { enqueue, handleCustomerMessage, handlePageEcho, pageForWebhook } from '@/lib/agent';
+import { waIncoming, waMediaDataUrl } from '@/lib/whatsapp';
 import { handleComment } from '@/lib/comments';
 import { maybeFollowup } from '@/lib/sales';
 
@@ -21,14 +22,15 @@ export async function GET(req) {
 // Incoming Messenger events and post comments, routed to the shop that owns the page
 export async function POST(req) {
   const raw = Buffer.from(await req.arrayBuffer());
-  if (!(await verifySignature(raw, req.headers.get('x-hub-signature-256')))) return new Response('Bad signature', { status: 401 });
-
+  const signature = req.headers.get('x-hub-signature-256');
   let payload;
   try {
     payload = JSON.parse(raw.toString('utf8'));
   } catch {
     return new Response('Bad JSON', { status: 400 });
   }
+  if (payload.object === 'whatsapp_business_account') return whatsapp(payload, raw, signature);
+  if (!(await verifySignature(raw, signature))) return new Response('Bad signature', { status: 401 });
   if (payload.object !== 'page') return new Response('OK');
 
   const jobs = [];
@@ -72,4 +74,29 @@ export async function POST(req) {
   // Answer Facebook right away (it retries slow webhooks); reply in the background
   after(() => Promise.all(jobs).then(maybeFollowup));
   return new Response('EVENT_RECEIVED');
+}
+
+// WhatsApp Cloud API: messages to a shop's connected number
+async function whatsapp(payload, raw, signature) {
+  const changes = (payload.entry || []).flatMap((e) => e.changes || []).filter((c) => c.field === 'messages');
+  const ids = [...new Set(changes.map((c) => String(c.value?.metadata?.phone_number_id || '')).filter(Boolean))];
+  const pages = (await Promise.all(ids.map(pageForWebhook))).filter(Boolean);
+  if (!(await verifySignature(raw, signature, pages.map((p) => p.app_secret)))) return new Response('Bad signature', { status: 401 });
+
+  const jobs = [];
+  for (const ch of changes) {
+    for (const m of waIncoming(ch.value)) {
+      const page = pages.find((p) => p.page_id === m.phoneId);
+      if (!page) continue; // number not connected, disabled, or owner suspended
+      jobs.push(
+        enqueue(`${page.page_id}:${m.from}`, async () => {
+          const image = m.mediaId ? await waMediaDataUrl(m.mediaId, page.access_token).catch(() => null) : null;
+          if (!m.text && !image) return;
+          await handleCustomerMessage(page, m.from, m.mid, m.text, image, m.payload, { name: m.name });
+        })
+      );
+    }
+  }
+  after(() => Promise.all(jobs).then(maybeFollowup));
+  return new Response('OK');
 }

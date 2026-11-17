@@ -13,6 +13,7 @@ function Pages() {
   const [token, setToken] = useState('');
   const [busy, setBusy] = useState('');
   const [manual, setManual] = useState(false);
+  const [waOpen, setWaOpen] = useState(false);
 
   const load = () => api('/pages').then(setData);
   useEffect(() => { load(); }, []);
@@ -38,11 +39,19 @@ function Pages() {
     run('manual', () => api('/pages', { method: 'POST', body: { token } }).then(() => setToken('')), 'পেজ কানেক্ট হয়েছে ✓');
   };
 
+  const addWhatsApp = (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const d = Object.fromEntries(new FormData(form));
+    run('wa', () => api('/pages/whatsapp', { method: 'POST', body: d }).then(() => { form.reset(); setWaOpen(false); }), 'WhatsApp নম্বর কানেক্ট হয়েছে ✓');
+  };
+  const copy = (t) => navigator.clipboard?.writeText(t).then(() => toast('কপি হয়েছে'));
+
   if (!data) return <div className="empty">লোড হচ্ছে...</div>;
 
   return (
     <>
-      <PageHead title="Facebook Pages" sub={`যে পেজগুলোতে বট কাস্টমারের মেসেজের উত্তর দেবে (${data.pages.length} / ${limitText(data.maxPages)})`}>
+      <PageHead title="Pages & WhatsApp" sub={`যে Facebook পেজ ও WhatsApp নম্বরে বট কাস্টমারের মেসেজের উত্তর দেবে (${data.pages.length} / ${limitText(data.maxPages)})`}>
         {data.oauth && (
           <a className="btn fb-btn" href="/api/fb/connect"><Icon name="fb" /> Facebook দিয়ে কানেক্ট করুন</a>
         )}
@@ -70,7 +79,7 @@ function Pages() {
       )}
 
       <div className="card" style={{ marginBottom: 14 }}>
-        <div className="card-head"><div><h3>কানেক্টেড পেজ</h3></div></div>
+        <div className="card-head"><div><h3>কানেক্টেড পেজ ও নম্বর</h3></div></div>
         {!data.pages.length ? (
           <div className="empty">
             এখনো কোনো পেজ কানেক্ট করা হয়নি।
@@ -80,14 +89,49 @@ function Pages() {
           <div className="list">
             {data.pages.map((p) => (
               <div className="li" key={p.id}>
-                <div className="avatar"><Icon name="fb" /></div>
-                <div className="t"><b>{p.name}</b><span>ID: {p.page_id} · কানেক্ট: {when(p.created_at)}</span></div>
+                <div className={`avatar ${p.channel === 'whatsapp' ? 'wa' : ''}`}>{p.channel === 'whatsapp' ? <Icon name="wa" /> : <Icon name="fb" />}</div>
+                <div className="t"><b>{p.name}</b><span>{p.channel === 'whatsapp' ? 'WhatsApp' : 'Messenger'} · ID: {p.page_id} · কানেক্ট: {when(p.created_at)}</span></div>
                 <span className="hint" style={{ margin: 0 }}>বট</span>
                 <label className="switch"><input type="checkbox" checked={!!p.active} onChange={() => toggle(p)} /><span /></label>
                 <button className="btn sm danger" disabled={!!busy} onClick={() => remove(p)}>ডিসকানেক্ট</button>
               </div>
             ))}
           </div>
+        )}
+      </div>
+
+      <div className="card" style={{ marginBottom: 14 }}>
+        <div className="card-head">
+          <div><h3>WhatsApp নম্বর কানেক্ট করুন</h3><p>WhatsApp এও একই AI উত্তর দেবে — প্রোডাক্টের দাম, ছবি চেনা, অর্ডার, কনফার্ম বাটন, ফলো-আপ সব</p></div>
+          <button className="btn sm wa-btn" onClick={() => setWaOpen((o) => !o)}><Icon name="wa" /> {waOpen ? 'লুকান' : 'কানেক্ট করুন'}</button>
+        </div>
+        {waOpen && (
+          <>
+            <ol className="steps">
+              <li><a className="link" href="https://developers.facebook.com/apps" target="_blank" rel="noreferrer">developers.facebook.com</a> → Create App (Business) → <b>WhatsApp</b> যোগ করুন, আপনার ব্যবসার নম্বর অ্যাড ও ভেরিফাই করুন।</li>
+              <li>WhatsApp → <b>API Setup</b> থেকে <b>Phone Number ID</b> আর <b>WhatsApp Business Account ID</b> কপি করুন।</li>
+              <li>Business Settings → System Users → একটি System User বানিয়ে <code>whatsapp_business_messaging</code> ও <code>whatsapp_business_management</code> পারমিশনসহ <b>স্থায়ী (permanent) টোকেন</b> তৈরি করুন।</li>
+              <li>
+                WhatsApp → <b>Configuration → Webhook</b> এ বসান — Callback URL: <code>{data.whatsapp.webhookUrl}</code> <button type="button" className="btn sm" onClick={() => copy(data.whatsapp.webhookUrl)}>কপি</button>
+                {' '}Verify token: <code>{data.whatsapp.verifyToken}</code> <button type="button" className="btn sm" onClick={() => copy(data.whatsapp.verifyToken)}>কপি</button>
+                {' '}তারপর <b>messages</b> ফিল্ড Subscribe করুন।
+              </li>
+              <li>নিচের ঘরগুলো পূরণ করে কানেক্ট চাপুন।</li>
+            </ol>
+            <form onSubmit={addWhatsApp}>
+              <div className="form-grid">
+                <div className="field"><label>Phone Number ID</label><input type="text" name="phone_id" inputMode="numeric" required placeholder="1234567890..." /></div>
+                <div className="field"><label>WhatsApp Business Account ID</label><input type="text" name="waba_id" inputMode="numeric" required placeholder="1029384756..." /></div>
+              </div>
+              <div className="field"><label>Permanent Access Token</label><input type="password" name="token" required placeholder="EAAG..." autoComplete="off" /></div>
+              <div className="field">
+                <label>App Secret (নিজের Meta App হলে)</label>
+                <input type="password" name="app_secret" placeholder="App Settings → Basic → App Secret" autoComplete="off" />
+                <div className="hint">নিজের Meta App দিয়ে কানেক্ট করলে দিন — এটা দিয়ে মেসেজগুলো আসলেই Meta থেকে আসছে কিনা যাচাই হয়।</div>
+              </div>
+              <button className="btn primary" disabled={busy === 'wa'}>{busy === 'wa' ? 'যাচাই হচ্ছে...' : 'WhatsApp কানেক্ট করুন'}</button>
+            </form>
+          </>
         )}
       </div>
 

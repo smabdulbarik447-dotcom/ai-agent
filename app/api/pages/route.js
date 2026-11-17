@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic';
 
 export const GET = guard(async (req, _p, user) => {
   const p = (await getPlatform());
-  const connected = (await db.prepare('SELECT id, page_id, name, active, created_at FROM pages WHERE user_id = ? ORDER BY id').all(user.id));
+  const connected = (await db.prepare("SELECT id, page_id, name, active, created_at, COALESCE(channel, 'messenger') AS channel FROM pages WHERE user_id = ? ORDER BY id").all(user.id));
   const ids = new Set(connected.map((x) => x.page_id));
   // Pages from the last Facebook login that aren't connected yet (tokens stay on the server)
   const options = JSON.parse((await getUserSettings(user.id)).fb_page_options || '[]')
@@ -24,6 +24,7 @@ export const GET = guard(async (req, _p, user) => {
     oauth: !!(p.fb_app_id && p.fb_app_secret),
     maxPages: (await activeSubscription(user.id))?.max_pages ?? 0,
     oauthRedirect: `${p.public_url || publicUrl(req)}/api/fb/callback`,
+    whatsapp: { webhookUrl: `${p.public_url || publicUrl(req)}/webhook`, verifyToken: p.fb_verify_token },
   });
 });
 
