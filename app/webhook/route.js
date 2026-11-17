@@ -52,19 +52,21 @@ export async function POST(req) {
       let text = null;
       let mid = null;
       let image = null;
+      let payload = null;
       if (ev.message) {
         mid = ev.message.mid;
         const atts = ev.message.attachments || [];
         // Photos/screenshots go to the AI; stickers (also type "image") are just a 👍
         const photo = atts.find((a) => a.type === 'image' && !a.payload?.sticker_id);
         image = photo?.payload?.url || null;
-        text = ev.message.text || ev.message.quick_reply?.payload || null;
+        payload = ev.message.quick_reply?.payload || null;
+        text = ev.message.text || payload || null;
         if (!text && !image && atts.length) text = atts[0].payload?.sticker_id ? '👍' : '[কাস্টমার একটি অ্যাটাচমেন্ট পাঠিয়েছে]';
       } else if (ev.postback) {
         mid = ev.postback.mid || `pb-${ev.timestamp}-${psid}`;
         text = ev.postback.title || ev.postback.payload;
       }
-      if (text || image) jobs.push(enqueue(`${page.page_id}:${psid}`, () => handleCustomerMessage(page, psid, mid, text, image)));
+      if (text || image) jobs.push(enqueue(`${page.page_id}:${psid}`, () => handleCustomerMessage(page, psid, mid, text, image, payload)));
     }
   }
   // Answer Facebook right away (it retries slow webhooks); reply in the background

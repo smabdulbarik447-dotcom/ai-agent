@@ -47,6 +47,7 @@ export default function TestChat({ maxHeight }) {
   const [pending, setPending] = useState(null);
   const [text, setText] = useState('');
   const [photo, setPhoto] = useState(null);
+  const [quick, setQuick] = useState([]); // Messenger quick-reply buttons under the last answer
   const box = useRef(null);
   const fileRef = useRef(null);
 
@@ -65,15 +66,17 @@ export default function TestChat({ maxHeight }) {
     }
   }
 
-  async function send(e) {
-    e.preventDefault();
-    const t = text.trim();
+  async function send(e, button) {
+    e?.preventDefault();
+    const t = button ? button.title : text.trim();
     if ((!t && !photo) || pending) return;
-    setText('');
-    setPending({ text: t, image: photo });
-    setPhoto(null);
+    if (!button) setText('');
+    setQuick([]);
+    setPending({ text: t, image: button ? null : photo });
+    if (!button) setPhoto(null);
     try {
-      await api('/test-chat', { method: 'POST', body: { text: t, image: photo } });
+      const r = await api('/test-chat', { method: 'POST', body: button ? { text: t, payload: button.payload } : { text: t, image: photo } });
+      setQuick(r.reply?.quick || []);
     } catch (err) {
       toast(err.message, true);
     }
@@ -84,6 +87,7 @@ export default function TestChat({ maxHeight }) {
   async function reset() {
     await api('/test-chat', { method: 'POST', body: { reset: true } });
     setMsgs([]);
+    setQuick([]);
   }
 
   return (
@@ -109,6 +113,11 @@ export default function TestChat({ maxHeight }) {
             <Bubble m={{ direction: 'in', text: pending.text, image_url: pending.image }} />
             <div className="typing">{pending.image ? 'AI ছবি দেখছে...' : 'AI লিখছে...'}</div>
           </>
+        )}
+        {!pending && quick.length > 0 && (
+          <div className="quick-replies">
+            {quick.map((q) => <button key={q.payload} type="button" onClick={() => send(null, q)}>{q.title}</button>)}
+          </div>
         )}
       </div>
       {photo && (

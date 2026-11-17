@@ -65,6 +65,8 @@ export default function OrdersTable({ orders, compact = false, onChange }) {
                   <b>{o.customer_name}</b>
                   {!compact && <div className="hint">{o.phone}<br />{o.address}</div>}
                   {!compact && <RiskBadge r={o.risk} />}
+                  {!compact && o.customer_confirmed === 1 && <div className="cconf" style={{ color: '#15803d' }}>✅ কাস্টমার নিজে কনফার্ম করেছে</div>}
+                  {!compact && o.customer_confirmed === -1 && <div className="cconf" style={{ color: '#b91c1c' }}>❌ কাস্টমার বাতিল করেছে</div>}
                 </td>
                 <td>{items.map((i) => <div key={i.product_id}>{i.name} × {i.qty}</div>)}</td>
                 <td style={{ whiteSpace: 'nowrap' }}>{money(o.total)}</td>

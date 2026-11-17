@@ -27,7 +27,8 @@ export const POST = guard(async (req, _p, user) => {
   if (!text && !image) throw new Error('মেসেজ লিখুন বা ছবি দিন');
   if (!(await activeSubscription(user.id))) throw new Error('বট চালাতে একটি প্ল্যান লাগবে — Billing থেকে প্ল্যান কিনুন।');
   (await saveMessage(customer.id, { direction: 'in', source: 'customer', text, image_url: image }));
-  const reply = await decideReply(user.id, customer, text || '', { hasImage: !!image });
+  const payload = typeof b.payload === 'string' ? b.payload.slice(0, 100) : null;
+  const reply = await decideReply(user.id, customer, text || '', { hasImage: !!image, payload });
   if (reply) {
     (await saveMessage(customer.id, { direction: 'out', source: reply.source, text: reply.text }));
     for (const url of reply.images) (await saveMessage(customer.id, { direction: 'out', source: reply.source, text: null, image_url: url }));

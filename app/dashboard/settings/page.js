@@ -72,6 +72,18 @@ export default function SettingsPage() {
             </div>
           </div>
           <div className="card">
+            <div className="card-head"><div><h3>অফার ও দামাদামি 🏷️</h3><p>ফ্রি ডেলিভারি আর &quot;কম হবে?&quot; প্রশ্নের উত্তর — AI নিজে থেকে কখনো দাম কমাবে না</p></div></div>
+            <div className="field">
+              <label>কত টাকার বেশি অর্ডারে ডেলিভারি ফ্রি (0 = বন্ধ)</label>
+              <input type="number" min="0" name="free_delivery_min" defaultValue={s.free_delivery_min} />
+            </div>
+            <div className="field">
+              <label>দামাদামির উত্তর</label>
+              <textarea name="bargain_reply" rows={3} defaultValue={s.bargain_reply} />
+              <div className="hint">কাস্টমার &quot;কম হবে?&quot;, &quot;discount ache?&quot;, &quot;last price?&quot; লিখলে এই উত্তর যাবে। {'{name}'} = কাস্টমারের নাম।</div>
+            </div>
+          </div>
+          <div className="card">
             <div className="card-head">
               <div><h3>স্মার্ট ফলো-আপ 🔔</h3><p>দাম জেনে চুপ হয়ে যাওয়া কাস্টমারকে বট নিজেই একবার মনে করিয়ে দেবে — হারানো সেল ফেরত আনে</p></div>
             </div>
