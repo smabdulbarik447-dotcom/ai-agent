@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Icon from '@/components/Icon';
-import { PageHead } from '@/components/Shell';
 import { BarChart } from '@/components/Charts';
 import { api, money, when, initials, PAY_METHOD } from '@/lib/client';
 
@@ -20,6 +19,16 @@ function Kpi({ color, icon, label, value, children }) {
   );
 }
 
+function Gauge({ value, label }) {
+  const v = Math.round(Math.min(100, Math.max(0, value || 0)));
+  return (
+    <div className="gauge" style={{ '--v': v }}>
+      <div className="dial"><b>{v}%</b></div>
+      <span>{label}</span>
+    </div>
+  );
+}
+
 const short = (v) => (v >= 1000 ? `${Math.round(v / 100) / 10}k` : v);
 
 export default function AdminOverview() {
@@ -30,7 +39,24 @@ export default function AdminOverview() {
 
   return (
     <>
-      <PageHead title="Admin Overview" sub="পুরো প্ল্যাটফর্মের অবস্থা" />
+      <section className="hud-hero">
+        <div className="reactor" aria-hidden="true">
+          <div className="core" />
+          <i className="orbit r1"><b /></i>
+          <i className="orbit r2"><b /></i>
+          <i className="orbit r3"><b /></i>
+        </div>
+        <div className="hud-hero-text">
+          <small>{'// PLATFORM STATUS · LIVE'}</small>
+          <h1>স্বাগতম, কমান্ডার</h1>
+          <p>সব সিস্টেম চালু — {t.users} ইউজার, {t.pages}টি পেজ/নম্বরে AI কাজ করছে। এই মাসে আয় {money(t.revenueMonth)}।</p>
+          <div className="gauges">
+            <Gauge value={t.users ? (t.paying / t.users) * 100 : 0} label="পেইড ইউজার" />
+            <Gauge value={t.revenueMonth ? Math.max(0, 100 - ((t.aiCostUsd * t.usdToBdt) / t.revenueMonth) * 100) : 0} label="লাভের হার" />
+            <Gauge value={t.users ? (t.trial / t.users) * 100 : 0} label="ট্রায়ালে" />
+          </div>
+        </div>
+      </section>
 
       {t.pending > 0 && (
         <div className="notice">
@@ -51,16 +77,16 @@ export default function AdminOverview() {
         <div className="card">
           <div className="card-head">
             <div><h3>আয়</h3><p>গত ১৪ দিনে অনুমোদিত পেমেন্ট</p></div>
-            <div className="legend"><span><i style={{ background: '#f97316' }} />Revenue</span></div>
+            <div className="legend"><span><i style={{ background: '#22d3ee' }} />Revenue</span></div>
           </div>
-          <BarChart days={s.days} series={[{ key: 'revenue', label: 'আয় ৳', color: '#f97316' }]} format={short} />
+          <BarChart days={s.days} series={[{ key: 'revenue', label: 'আয় ৳', color: '#22d3ee' }]} format={short} />
         </div>
         <div className="card">
           <div className="card-head">
             <div><h3>নতুন ইউজার</h3><p>গত ১৪ দিনে সাইন আপ</p></div>
-            <div className="legend"><span><i style={{ background: '#16a34a' }} />Signups</span></div>
+            <div className="legend"><span><i style={{ background: '#c084fc' }} />Signups</span></div>
           </div>
-          <BarChart days={s.days} series={[{ key: 'signups', label: 'সাইন আপ', color: '#16a34a' }]} />
+          <BarChart days={s.days} series={[{ key: 'signups', label: 'সাইন আপ', color: '#c084fc' }]} />
         </div>
       </section>
 

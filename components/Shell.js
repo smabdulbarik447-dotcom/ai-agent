@@ -71,6 +71,69 @@ function PlanCard({ sub }) {
   );
 }
 
+// Admin "command deck": a completely different layout from the shop panel —
+// top holographic command bar, live clock, status ticker, dark space HUD.
+function HudClock() {
+  const [now, setNow] = useState(null);
+  useEffect(() => {
+    const tick = () => setNow(new Date());
+    tick();
+    const t = setInterval(tick, 1000);
+    return () => clearInterval(t);
+  }, []);
+  if (!now) return <span className="hud-clock">--:--:--</span>;
+  const time = now.toLocaleTimeString('en-GB', { timeZone: 'Asia/Dhaka', hour12: false });
+  const date = now.toLocaleDateString('en-GB', { timeZone: 'Asia/Dhaka', day: '2-digit', month: 'short', year: 'numeric' });
+  return <span className="hud-clock"><b>{time}</b><small>{date} · DHAKA</small></span>;
+}
+
+function AdminDeck({ active, badges, me, logout, children }) {
+  const pending = badges.payments || 0;
+  const ticker = [
+    'SYSTEM ONLINE',
+    pending ? `${pending} PAYMENT AWAITING REVIEW` : 'NO PENDING PAYMENTS',
+    'AI AGENTS ACTIVE ON MESSENGER + WHATSAPP',
+    `OPERATOR: ${(me?.user.name || 'ADMIN').toUpperCase()}`,
+    'ALL DATA ENCRYPTED IN TRANSIT',
+  ];
+  return (
+    <div className="hud">
+      <div className="hud-bg" aria-hidden="true">
+        <div className="hud-stars" />
+        <div className="hud-floor" />
+        <div className="hud-scan" />
+      </div>
+      <header className="hud-top">
+        <Link href="/admin" className="hud-brand">
+          <span className="hud-logo">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.svg" alt="" />
+          </span>
+          <span className="hud-title"><b>SHOB PAABO</b><small>COMMAND DECK</small></span>
+        </Link>
+        <nav className="hud-nav">
+          {NAV.admin.map(([href, label, icon, badge]) => (
+            <Link key={href} href={href} className={active(href) ? 'on' : ''}>
+              <Icon name={icon} />
+              <span>{label}</span>
+              {badge && badges[badge] > 0 && <em>{badges[badge]}</em>}
+            </Link>
+          ))}
+        </nav>
+        <div className="hud-right">
+          <HudClock />
+          <Link className="hud-chip" href="/dashboard" title="নিজের শপ ড্যাশবোর্ড">শপ</Link>
+          <button className="hud-chip off" onClick={logout} title="Logout">⏻</button>
+        </div>
+      </header>
+      <main className="hud-main">{children}</main>
+      <footer className="hud-ticker" aria-hidden="true">
+        <div>{[...ticker, ...ticker].map((t, i) => <span key={i}>◆ {t}</span>)}</div>
+      </footer>
+    </div>
+  );
+}
+
 export default function Shell({ variant = 'user', children }) {
   const path = usePathname();
   const router = useRouter();
@@ -106,6 +169,14 @@ export default function Shell({ variant = 'user', children }) {
   const badges = me?.badges || {};
 
   if (variant === 'admin' && me?.user.role !== 'admin') return null;
+
+  if (variant === 'admin') {
+    return (
+      <ShellContext.Provider value={{ toggle: () => {}, me, reload }}>
+        <AdminDeck path={path} active={active} badges={badges} me={me} logout={logout}>{children}</AdminDeck>
+      </ShellContext.Provider>
+    );
+  }
 
   return (
     <ShellContext.Provider value={{ toggle: () => setOpen((o) => !o), me, reload }}>

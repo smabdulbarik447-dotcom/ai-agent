@@ -22,16 +22,26 @@ function AdminLoginForm() {
   }
 
   return (
-    <div className="auth admin-auth">
-      <form className="card" onSubmit={submit}>
-        <div className="head">
+    <div className="hud-login">
+      <div className="hud-bg" aria-hidden="true">
+        <div className="hud-stars" />
+        <div className="hud-floor" />
+        <div className="hud-scan" />
+      </div>
+      <form className="vault" onSubmit={submit}>
+        <div className="vault-rings" aria-hidden="true">
+          <i className="vr1" /><i className="vr2" /><i className="vr3" />
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo.svg" alt="" />
-          <h2>Admin Panel</h2>
-          <p>শুধু প্ল্যাটফর্ম অ্যাডমিনের জন্য</p>
+          <span className="vault-sweep" />
         </div>
-        <div className="field"><label>অ্যাডমিন পাসওয়ার্ড</label><input type="password" name="password" autoComplete="current-password" required autoFocus /></div>
-        <button className="btn primary block" disabled={busy}>{busy ? 'অপেক্ষা করুন...' : 'অ্যাডমিন লগইন'}</button>
+        <small className="vault-tag">{'// RESTRICTED ACCESS · LEVEL 5'}</small>
+        <h2>COMMAND DECK</h2>
+        <p>শুধু প্ল্যাটফর্ম অ্যাডমিনের জন্য</p>
+        <label htmlFor="admin-pass">ACCESS CODE</label>
+        <input id="admin-pass" type="password" name="password" autoComplete="current-password" required autoFocus placeholder="••••••••" />
+        <button className="vault-btn" disabled={busy}>{busy ? 'যাচাই হচ্ছে...' : 'প্রবেশ করুন  →'}</button>
+        <div className="vault-foot"><span><i /> SECURE CHANNEL</span><span>HTTPS · TLS</span></div>
       </form>
     </div>
   );
