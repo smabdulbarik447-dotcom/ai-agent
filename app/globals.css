@@ -130,11 +130,18 @@ tbody tr:hover { background: #fbfcfb; }
 .pill { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 700; white-space: nowrap; }
 .pill.new { background: var(--blue-l); color: var(--blue); }
 .pill.confirmed, .pill.in_stock, .pill.src-ai, .pill.on { background: var(--green-l); color: var(--green-d); }
+.risk { display: inline-block; margin-top: 4px; padding: 2px 8px; border-radius: 6px; font-size: 11.5px; font-weight: 600; }
+.risk-high { background: #fde8e8; color: #b91c1c; }
+.risk-medium { background: #fff4e0; color: #b45309; }
+.risk-good { background: #e7f7ed; color: #15803d; }
+.risk-new { background: #eef1f0; color: #5b6762; }
+.pill.src-order { background: #fce7f3; color: #be185d; }
+.pill.src-followup { background: #fef9c3; color: #a16207; }
 .pill.src-product { background: #e6f6f4; color: #0f766e; }
 .pill.processing, .pill.src-rule { background: var(--orange-l); color: #c2570c; }
 .pill.shipped, .pill.src-manual, .pill.src-page { background: var(--purple-l); color: var(--purple); }
 .pill.delivered { background: #e6f6f4; color: #0f766e; }
-.pill.cancelled, .pill.out_of_stock, .pill.off { background: var(--red-l); color: var(--red); }
+.pill.cancelled, .pill.returned, .pill.out_of_stock, .pill.off { background: var(--red-l); color: var(--red); }
 .pill.unknown, .pill.src-fallback { background: #f0f2f1; color: var(--ink-2); }
 .thumb { width: 38px; height: 38px; border-radius: 8px; object-fit: cover; background: #f0f2f1; flex: none; }
 .prod { display: flex; align-items: center; gap: 10px; }

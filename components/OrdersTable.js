@@ -3,6 +3,23 @@
 import { useState } from 'react';
 import { api, money, toast, when, STATUS } from '@/lib/client';
 
+const RISK = {
+  high: ['risk-high', '⚠ ফেক অর্ডারের ঝুঁকি'],
+  medium: ['risk-medium', '⚠ আগে বাতিল/রিটার্ন আছে'],
+  good: ['risk-good', '✓ বিশ্বস্ত কাস্টমার'],
+  new: ['risk-new', 'নতুন কাস্টমার'],
+};
+
+function RiskBadge({ r }) {
+  if (!r) return null;
+  const [cls, label] = RISK[r.level] || RISK.new;
+  return (
+    <div className={`risk ${cls}`} title="সব দোকান মিলিয়ে এই নম্বরের অর্ডার হিস্ট্রি">
+      {label} · {r.total} অর্ডার, {r.delivered} ডেলিভারড{r.bad ? `, ${r.bad} বাতিল/রিটার্ন` : ''}
+    </div>
+  );
+}
+
 export default function OrdersTable({ orders, compact = false, onChange }) {
   const [busy, setBusy] = useState(null);
   if (!orders.length) {
@@ -47,6 +64,7 @@ export default function OrdersTable({ orders, compact = false, onChange }) {
                 <td>
                   <b>{o.customer_name}</b>
                   {!compact && <div className="hint">{o.phone}<br />{o.address}</div>}
+                  {!compact && <RiskBadge r={o.risk} />}
                 </td>
                 <td>{items.map((i) => <div key={i.product_id}>{i.name} × {i.qty}</div>)}</td>
                 <td style={{ whiteSpace: 'nowrap' }}>{money(o.total)}</td>

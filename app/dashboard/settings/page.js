@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { PageHead, useMe } from '@/components/Shell';
 import { api, toast } from '@/lib/client';
 
-const SWITCHES = ['pause_on_manual_reply', 'sync_ai_extract', 'notify_order_status'];
+const SWITCHES = ['pause_on_manual_reply', 'sync_ai_extract', 'notify_order_status', 'followup_enabled'];
 
 export default function SettingsPage() {
   const { me, reload } = useMe();
@@ -70,6 +70,25 @@ export default function SettingsPage() {
               <label className="switch"><input type="checkbox" name="sync_ai_extract" defaultChecked={s.sync_ai_extract === '1'} /><span /></label>
               <span>AI দিয়ে পেজ পড়া <span className="hint">(সাধারণ ওয়েবসাইটে প্রোডাক্ট ডাটা না পেলে)</span></span>
             </div>
+          </div>
+          <div className="card">
+            <div className="card-head">
+              <div><h3>স্মার্ট ফলো-আপ 🔔</h3><p>দাম জেনে চুপ হয়ে যাওয়া কাস্টমারকে বট নিজেই একবার মনে করিয়ে দেবে — হারানো সেল ফেরত আনে</p></div>
+            </div>
+            <div className="switch-row">
+              <label className="switch"><input type="checkbox" name="followup_enabled" defaultChecked={s.followup_enabled === '1'} /><span /></label>
+              অটো ফলো-আপ চালু
+            </div>
+            <div className="field">
+              <label>শেষ মেসেজের কত ঘণ্টা পরে পাঠাবে (১–২০)</label>
+              <input type="number" min="1" max="20" name="followup_hours" defaultValue={s.followup_hours} />
+            </div>
+            <div className="field">
+              <label>ফলো-আপ মেসেজ</label>
+              <textarea name="followup_text" rows={3} defaultValue={s.followup_text} />
+              <div className="hint">{'{name}'} = কাস্টমারের নাম, {'{product}'} = যে প্রোডাক্টের দাম জেনেছিল, {'{price}'} = দাম। Facebook এর নিয়মে কাস্টমারের শেষ মেসেজের ২৪ ঘণ্টার মধ্যেই পাঠানো হয়, একজনকে একবারই।</div>
+            </div>
+            <div className="hint">গত ৩০ দিনে: <b>{s.followup_stats?.sent || 0}</b>টি ফলো-আপ পাঠানো হয়েছে, এর থেকে <b>{s.followup_stats?.won || 0}</b>টি অর্ডার এসেছে।</div>
           </div>
           <div className="card">
             <div className="card-head"><div><h3>অর্ডার ও কুরিয়ার</h3><p>অর্ডারের স্ট্যাটাস বদলালে কাস্টমারকে জানানো আর Steadfast এ এক ক্লিকে পার্সেল বুক</p></div></div>

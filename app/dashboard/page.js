@@ -144,6 +144,27 @@ export default function Overview() {
           </div>
           <div className="card">
             <div className="card-head">
+              <div><h3>🔥 হট লিড</h3><p>গত ৩ দিনে দাম জেনেছে কিন্তু এখনো অর্ডার করেনি — একটা মেসেজ দিলেই সেল হতে পারে</p></div>
+            </div>
+            <div className="list">
+              {s.leads?.length ? (
+                s.leads.map((l) => (
+                  <Link className="li" key={l.id} href={`/dashboard/inbox?c=${l.id}`}>
+                    <div className="avatar">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      {l.profile_pic ? <img src={l.profile_pic} alt="" /> : initials(l.name)}
+                    </div>
+                    <div className="t"><b>{l.name || 'Facebook User'}</b><span>{l.product} · {money(l.price)}{l.phone ? ` · ${l.phone}` : ''}</span></div>
+                    <div className="time">{when(l.interest_at)}<br />{l.followup_at ? <span className="hint">🔔 ফলো-আপ গেছে</span> : null}</div>
+                  </Link>
+                ))
+              ) : (
+                <div className="empty">এখন কোনো হট লিড নেই</div>
+              )}
+            </div>
+          </div>
+          <div className="card">
+            <div className="card-head">
               <div><h3>Stock Alert</h3><p>স্টক শেষ বা কম</p></div>
               <Link className="link" href="/dashboard/products">View All ↗</Link>
             </div>

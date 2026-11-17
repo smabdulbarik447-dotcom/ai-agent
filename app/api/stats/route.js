@@ -16,7 +16,7 @@ export const GET = guard(async (_req, _p, user) => {
       `WITH RECURSIVE d(day) AS (SELECT date('now','-13 days') UNION ALL SELECT date(day,'+1 day') FROM d WHERE day < date('now'))
        SELECT d.day,
          (SELECT COUNT(*) FROM ${M} WHERE date(m.created_at) = d.day AND m.direction = 'in') AS incoming,
-         (SELECT COUNT(*) FROM ${M} WHERE date(m.created_at) = d.day AND m.direction = 'out' AND m.source IN ('rule','ai','product')) AS auto
+         (SELECT COUNT(*) FROM ${M} WHERE date(m.created_at) = d.day AND m.direction = 'out' AND m.source IN ('rule','ai','product','order','followup')) AS auto
        FROM d`
     )
     .all(uid, uid));
@@ -24,7 +24,7 @@ export const GET = guard(async (_req, _p, user) => {
     .prepare(`SELECT m.source, COUNT(*) AS c FROM ${M} WHERE m.direction = 'out' AND m.created_at >= datetime('now','-30 days') GROUP BY m.source ORDER BY c DESC`)
     .all(uid));
   const inCount = (await one(`SELECT COUNT(*) AS c FROM ${M} WHERE m.direction='in' AND m.created_at >= datetime('now','-30 days')`, uid)).c;
-  const autoCount = sources.filter((x) => x.source === 'rule' || x.source === 'ai' || x.source === 'product').reduce((a, x) => a + x.c, 0);
+  const autoCount = sources.filter((x) => x.source === 'rule' || x.source === 'ai' || x.source === 'product' || x.source === 'order').reduce((a, x) => a + x.c, 0);
   return json({
     business: { name: s.business_name, tagline: s.tagline, logo: s.logo_url || '/logo.svg' },
     totals: {
@@ -55,5 +55,15 @@ export const GET = guard(async (_req, _p, user) => {
       products: !!(await one('SELECT COUNT(*) AS c FROM products WHERE user_id = ?', uid)).c,
     },
     aiUsed: (await aiUsage(uid)),
+    // asked about a product in the last 3 days but hasn't ordered yet
+    leads: (await db
+      .prepare(
+        `SELECT c.id, c.name, c.profile_pic, c.phone, c.interest_at, c.followup_at, p.name AS product, p.price
+         FROM customers c JOIN products p ON p.id = c.interest_product
+         WHERE c.user_id = ? AND c.is_test = 0 AND c.interest_at > datetime('now', '-3 days')
+           AND NOT EXISTS (SELECT 1 FROM orders o WHERE o.customer_id = c.id AND o.created_at >= c.interest_at)
+         ORDER BY c.interest_at DESC LIMIT 8`
+      )
+      .all(uid)),
   });
 });

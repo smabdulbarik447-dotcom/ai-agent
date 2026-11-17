@@ -4,7 +4,7 @@ import { guard, json, body } from '@/lib/api';
 
 export const runtime = 'nodejs';
 
-const STATUSES = ['new', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'];
+const STATUSES = ['new', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'returned'];
 
 // Change status; the customer gets a Messenger update when that's turned on
 export const PUT = guard(async (req, { id }, user) => {

@@ -3,6 +3,7 @@ import { getPlatform } from '@/lib/db';
 import { verifySignature } from '@/lib/facebook';
 import { enqueue, handleCustomerMessage, handlePageEcho, pageForWebhook } from '@/lib/agent';
 import { handleComment } from '@/lib/comments';
+import { maybeFollowup } from '@/lib/sales';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -67,6 +68,6 @@ export async function POST(req) {
     }
   }
   // Answer Facebook right away (it retries slow webhooks); reply in the background
-  after(() => Promise.all(jobs));
+  after(() => Promise.all(jobs).then(maybeFollowup));
   return new Response('EVENT_RECEIVED');
 }
