@@ -52,6 +52,11 @@ export default async function Landing() {
             <a href="#pricing" className="btn">প্ল্যান দেখুন</a>
           </div>
         </div>
+        <div className="stage3d">
+          <div className="phone-shadow" />
+          <div className="float-chip fc1">✅ অর্ডার কনফার্ম</div>
+          <div className="float-chip fc2">⚡ ১ সেকেন্ডে রিপ্লাই</div>
+          <div className="float-chip fc3">💬 WhatsApp + Messenger</div>
         <div className="lp-demo">
           <div className="chat-head">
             <div className="avatar"><Icon name="bot" /></div>
@@ -63,6 +68,7 @@ export default async function Landing() {
             <div className="msg-wrap in"><div className="msg in">2ta nibo, Rahim, 01712345678, Mirpur 10</div></div>
             <div className="msg-wrap out"><div className="msg out">ধন্যবাদ রহিম ভাই! ২টি Vitamin C Serum — মোট ৳১,৩৬০ (ডেলিভারিসহ)। আপনার অর্ডার #১২৫৪ কনফার্ম হয়েছে 🎉</div></div>
           </div>
+        </div>
         </div>
       </section>
 
